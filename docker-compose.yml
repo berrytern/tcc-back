@@ -1,0 +1,45 @@
+version: "3.8"
+services:
+  mongo:
+    image: mongo:4.4.6
+    container_name: tcc-mongo
+    ports:
+      - 27017:27017
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin
+    volumes:
+      - tcc-mongo-data:/data/db
+    networks:
+      - tcc-network
+    logging:
+      driver: json-file
+      options:
+        max-size: 100m
+  
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: sfz-rabbitmq
+    restart: always
+    ports:
+      - 15672:15672 # Management UI
+      - 5672:5672 # AMQP Protocol
+      - 5671:5671 # AMQPS Protocol
+    volumes:
+      - ./.certs/rabbitmq:/etc/ssl:ro
+      - ./external_config/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+    networks: 
+      - tcc-network
+    logging:
+      driver: json-file
+      options:
+        max-size: 100m
+
+volumes:
+  tcc-mongo-data:
+      name: tcc-mongo
+networks:
+  tcc-network:
+    name: tcc-network
+    driver: bridge
