@@ -8,7 +8,8 @@ pub struct GestorController{
     pub service: dyn Service,
 }
 impl Contructor for GestorController{
-    fn new<Service>(&self, service: &impl Service) ->  Self{
+    type Dependency = impl Service;
+    fn new(&self, service: Self::Dependency) ->  Self {
         self.service = service;
         return self;
     }}

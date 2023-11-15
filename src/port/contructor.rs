@@ -1,5 +1,5 @@
 
-
 pub trait Contructor{
-    fn new<T>(&self, dependency: &impl T) -> Self;    
+    type Dependency;
+    fn new(&self, service: Self::Dependency  ) -> Self;    
 }

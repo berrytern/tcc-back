@@ -14,6 +14,6 @@ struct User {
     pub name: String,
     #[serde(alias = "type")]
     pub user_type: String,
-    pub email: String, 
-    pub matricula: Option<String>, 
+    pub email: String,
+    pub matricula: Option<String>,
 }
