@@ -7,20 +7,15 @@ struct Controllers{
     pub gestor: Box<dyn Controller>
 }
 
-struct App{
+pub struct App{
     pub controllers: Controllers
 }
 
 
 pub async fn build() -> App{
-    let a = GestorController{
-        service: todo!(),
-    };
-    let gestor_controller = Box::new(a);
-
     App{
         controllers: Controllers{
-            gestor: Box::new(a)
+            gestor: Box::new(GestorController{})
         }
     }
 }
