@@ -1,11 +1,10 @@
 use mongodb::{
-    bson::{doc, extjson::de::Error, oid::ObjectId, to_bson, to_document, Document},
-    results::{InsertOneResult,UpdateResult,DeleteResult},
+    bson::{doc, extjson::de::Error as BsonError, oid::ObjectId, to_bson, Document},
+    results::{UpdateResult,DeleteResult},
     options::FindOptions,
     Client, options::ClientOptions,
-    Collection,
 };
-
+use mongodb::error::Error as MongoDbError;
 use futures::stream::TryStreamExt;
 
 
@@ -16,28 +15,29 @@ pub async fn get_connection(uri: &str) -> Result<Client, mongodb::error::Error> 
     client_options.app_name = Some("My App".to_string());
     return Client::with_options(client_options);
 }
+#[derive(Clone)]
 pub struct Model<T>{
     collection: mongodb::Collection<T>,
 }
 
-impl<T> Model<T>  {
-    pub async fn new (db: mongodb::Database, collection_name: &str) ->  Self {
-        Model::<T>{
+impl<T,F> Model<T>  {
+    pub async fn new(db: mongodb::Database, collection_name: &str) ->  Self {
+        Model::<T, F>{
             collection: db.collection::<T>(collection_name)
         }
     }
 
-    pub async fn get_by_id(&self, id: ObjectId) -> Result<Option<T>, Error>
+    pub async fn find_one(&self, filter: Document) -> Result<Option<T>, BsonError>
     where
     T: DeserializeOwned + Unpin + Send + Sync,
     {
         let result= self.collection.find_one(
-            doc!{"_id": id}, None
+            filter, None
         ).await.ok().expect("Error on creating operation");
         Ok(result)
     }
 
-    pub async fn find(&self, filter: Document) -> Result<Vec<T>, Error>
+    pub async fn find(&self, filter: Document) -> Result<Vec<T>, BsonError>
     where
     T: DeserializeOwned + Unpin + Send + Sync + Serialize,
     {
@@ -45,42 +45,40 @@ impl<T> Model<T>  {
         let options = FindOptions::builder().limit(10).build();
         let mut cursor= self.collection.find(
             filter, options
-        ).await.ok().expect("Error on creating operation");
+        ).await.ok().expect("Error on find operation");
         while let Some(book) = cursor.try_next().await.ok().expect("Iteration Error") {
             result.push(book)
         }
         Ok(result)
     }
 
-    pub async fn create(&self, data: T) -> Result<InsertOneResult, Error> 
+    pub async fn create(&self, data: &T) -> Result<Option<ObjectId>, MongoDbError> 
     where
     T: Serialize,
     {
-        let result= self.collection.insert_one(
+        self.collection.insert_one(
             data, None
-        ).await.ok().expect("Error on creating operation");
-        Ok(result)
+        ).await
+            .map(|op| Some(op.inserted_id.as_object_id().unwrap()))
     }
 
-    pub async fn update_one(&self, data: T, id: ObjectId) -> Result<UpdateResult, Error> 
+    pub async fn update_one(&self, data: F, id: ObjectId) -> Result<UpdateResult, BsonError> 
     where
-    T: Serialize + std::convert::From<T>,
+    T: Serialize + std::convert::From<F>,
     {
-        let d = to_bson::<T>(&data).ok().expect("Error on bson conversion");
+        let d = to_bson::<F>(&data).ok().expect("Error on bson conversion");
         let result= self.collection.update_one(
             doc!{ "_id": id }, doc!{"$set": d}, None
         ).await.ok().expect("Error on creating operation");
         Ok(result)
     }
 
-    pub async fn delete_one(&self, id: ObjectId) -> Result<DeleteResult, Error> 
+    pub async fn delete_one(&self, filter: Document) -> Result<bool, MongoDbError>
     where
     T: Serialize,
     {
-        let result= self.collection.delete_one(
-            doc!{ "_id": id }, None
-        ).await.ok().expect("Error on creating operation");
-        Ok(result)
+        self.collection.delete_one(filter, None).await
+            .map(|result| result.deleted_count != 0)
     }
 
 }

@@ -1,21 +1,28 @@
-use controllers::controller::Controller;
-use controllers::gestor_controller::GestorController;
+use crate::infrastructure::database::schemas::user_schema::OptionUser;
+use crate::infrastructure::repository::gestor_repository::GestorRepository;
+use crate::infrastructure::database::{schemas::user_schema::User,connection::{Model, get_connection}};
+use crate::utils::settings::Env;
 
-use crate::controllers;
 
-struct Controllers{
-    pub gestor: Box<dyn Controller>
+#[derive(Clone)]
+pub struct Repository{
+    pub gestor: GestorRepository
 }
 
-pub struct App{
-    pub controllers: Controllers
+#[derive(Clone)]
+pub struct App {
+    pub repositories: Repository
 }
 
 
-pub async fn build() -> App{
+pub async fn build(env: &Env) -> App{
+    let client = get_connection(&env.mongodb_uri).await.ok().expect("Cannot connect to MongoDb");
+    let db = client.database("teste");
+    let user_model = Model::<User,OptionUser>::new(db, "users").await;
+   
     App{
-        controllers: Controllers{
-            gestor: Box::new(GestorController{})
-        }
+        repositories: Repository{
+            gestor: GestorRepository::new(Box::new(user_model)),
+        },
     }
 }

@@ -3,14 +3,12 @@ mod controllers;
 mod port;
 mod routes;
 mod infrastructure;
-use std::env;
-use dotenv::dotenv;
-use actix_web::{App, HttpResponse, HttpServer, Responder};
-use controllers::gestor_controller::GestorController;
+mod utils;
+mod errors;
+use actix_web::{App, HttpServer, web::{Data,get,post,put,delete}};
 use crate::di::d_injection::build;
-use routes::gestor::{get_gestor,create_gestor,update_gestor,delete_gestor};
-use infrastructure::database::{schemas::user_schema::User,connection::{Model, get_connection}};
-use mongodb::bson::doc;
+use routes::gestor::{get_gestor,create_gestor,update_gestor,delete_gestor, get_all_gestor};
+use utils::settings::load_env;
 
 /*async fn manual_hello() -> impl Responder {
     HttpResponse::Ok().body("Hey there!")
@@ -29,27 +27,20 @@ async fn main() {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    let app = build().await;
-    dotenv().ok();
-    let workers = match env::var("WORKERS"){
-        Ok(var) => var,
-        Err(_error) => panic!("Environment variable 'WORKERS' not setted")
-    };
-    let mongodbURI = match env::var("MONGODB_URI"){
-        Ok(var) => var,
-        Err(_error) => panic!("Environment variable 'WORKERS' not setted")
-    };
+    let env = load_env();
+    let app = build(&env).await;
 
-    let client = get_connection(&mongodbURI).await.ok().expect("Cannot connect to MongoDb");
-    let db = client.database("teste");
-    let userModel = Model::<User>::new(db, "users").await;
-    HttpServer::new(|| {
+    HttpServer::new(move || {
         println!("running");
-
         App::new()
-            .route("/hey", app.controllers.gestor.get_one())
+            .app_data(Data::new(app))
+            .route("/gestor", get().to(get_all_gestor))
+            .route("/gestor", post().to(create_gestor))
+            .route("/gestor/{id}", get().to(get_gestor))
+            .route("/gestor/{id}", put().to(update_gestor))
+            .route("/gestor/{id}", delete().to(delete_gestor))
     })
     .bind(("0.0.0.0", 8080))?
-    .workers(workers.to_string().parse::<usize>().unwrap()).run()
+    .workers(env.workers.into()).run()
     .await
 }

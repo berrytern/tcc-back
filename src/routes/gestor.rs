@@ -1,50 +1,55 @@
-use std::convert::Infallible;
-
-use actix_web::{Responder, HttpResponse};
-use mongodb::bson::oid::ObjectId;
-use crate::infrastructure::database::{schemas::user_schema::User,connection::Model};
+use std::{str::FromStr};
 
 
-pub async fn get_gestor(user_model: Model<User>, id: ObjectId) -> HttpResponse {
-    let result = user_model.get_by_id(id).await;
-    if let Err(err) = result {
-        HttpResponse::InternalServerError().body(err.to_string())
-    } else{
-        let body = result.unwrap();
-        HttpResponse::Ok().json(if body.is_some() { Some(body) } else { None })
-    }
+use actix_web::{web::{Json,Data,Path,Query},HttpRequest,HttpResponse, Responder};
+use mongodb::bson::{oid::ObjectId, doc};
+use crate::{infrastructure::database::schemas::user_schema::{OptionUser, User}, errors::AppError};
+use crate::di::d_injection::App;
+use crate::routes::handler::HANDLER;
+
+
+pub async fn get_gestor(app: Data<App>, query: Query<OptionUser>, id: Path<ObjectId>) -> Result<impl Responder, AppError> {
+    let repository = &app.repositories.gestor;
+    let mut user = query.into_inner();
+    user.id = Some(id.into_inner()); 
+    repository.get_one(user).await
+        .map(|result| HttpResponse::Ok().json(result))
+        .map_err(|err| HANDLER(Box::new(err)))
 }
 
-pub async fn get_all_gestor(user_model: Model<User>, id: ObjectId) -> HttpResponse {
-    let result = user_model.find(id).await;
-    if let Err(err) = result {
-        HttpResponse::InternalServerError().body(err.to_string())
-    } else{
-        let body = result.unwrap();
-        HttpResponse::Ok().json(body)
-    }
+pub async fn get_all_gestor(app: Data<App>, query: Query<OptionUser>) -> Result<impl Responder, AppError> {
+    let repository = &app.repositories.gestor;
+    let user = query.into_inner();
+    repository.get_all(user).await
+        .map(|result| HttpResponse::Ok().json(result))
+        .map_err(|err| HANDLER(Box::new(err)))
 }
 
-pub async fn create_gestor(user_model: Model<User>, user: User) -> HttpResponse {
-    let result = user_model.create(user).await;
-    if let Err(err) = result {
-        HttpResponse::InternalServerError().body(err.to_string())
-    } else{
-        let body: User= result.unwrap().into();
-        return HttpResponse::Created().json(body);
-    }
+pub async fn create_gestor(app: Data<App>, user: Json<User>) -> Result<impl Responder, AppError> {
+    let repository = &app.repositories.gestor;
+    repository.create(Box::new(user.into_inner())).await
+        .map(|result| {
+            if result.is_some() {HttpResponse::Created().json(&Some(result))} else {HttpResponse::Ok().body("")}
+        })
+        .map_err(|err| HANDLER(Box::new(err)))
 }
 
-pub async fn update_gestor() -> HttpResponse {
-    HttpResponse::Ok().body("body")
-
+pub async fn update_gestor(app: Data<App>, user: Json<OptionUser>, id: Path<ObjectId>) -> Result<impl Responder, AppError> {
+    let repository = &app.repositories.gestor;
+    repository.update_one(
+        &user.into_inner(), id.into_inner()
+    ).await
+        .map(|result| {
+            if result.is_some() {HttpResponse::Ok().json(&Some(result))} else {HttpResponse::Ok().body("")}
+        })
+        .map_err(|err| HANDLER(Box::new(err)))
 }
 
-pub async fn delete_gestor(user_model: Model<User>, id: ObjectId) -> HttpResponse {
-    let result = user_model.delete_one(id).await;
-    if let Err(err) = result {
-        HttpResponse::InternalServerError().body(err.to_string())
-    } else{
-        HttpResponse::Ok().body("body")
-    }
+pub async fn delete_gestor(app: Data<App>, id: Path<ObjectId>) -> Result<impl Responder, AppError> {
+    let repository = &app.repositories.gestor;
+    repository.delete_one(
+        id.into_inner()
+    ).await
+        .map(|result| HttpResponse::Ok().json(result))
+        .map_err(|err| HANDLER(Box::new(err)))
 }
