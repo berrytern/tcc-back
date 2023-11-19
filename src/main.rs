@@ -5,7 +5,7 @@ mod routes;
 mod infrastructure;
 mod utils;
 mod errors;
-use actix_web::{App, HttpServer, web::{Data,get,post,put,delete}};
+use actix_web::{App, HttpServer, web::{Data,get,post,patch,delete}};
 use crate::di::d_injection::build;
 use routes::aluno::{get_aluno,create_aluno,update_aluno,delete_aluno, get_all_aluno};
 use routes::gestor::{get_gestor,create_gestor,update_gestor,delete_gestor, get_all_gestor};
@@ -39,17 +39,17 @@ async fn main() -> std::io::Result<()> {
             .route("/aluno", get().to(get_all_aluno))
             .route("/aluno", post().to(create_aluno))
             .route("/aluno/{id}", get().to(get_aluno))
-            .route("/aluno/{id}", put().to(update_aluno))
+            .route("/aluno/{id}", patch().to(update_aluno))
             .route("/aluno/{id}", delete().to(delete_aluno))
             .route("/gestor", get().to(get_all_gestor))
             .route("/gestor", post().to(create_gestor))
             .route("/gestor/{id}", get().to(get_gestor))
-            .route("/gestor/{id}", put().to(update_gestor))
+            .route("/gestor/{id}", patch().to(update_gestor))
             .route("/gestor/{id}", delete().to(delete_gestor))
             .route("/professor", get().to(get_all_professor))
             .route("/professor", post().to(create_professor))
             .route("/professor/{id}", get().to(get_professor))
-            .route("/professor/{id}", put().to(update_professor))
+            .route("/professor/{id}", patch().to(update_professor))
             .route("/professor/{id}", delete().to(delete_professor))
     })
     .bind(("0.0.0.0", 8080))?
