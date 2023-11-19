@@ -1,8 +1,8 @@
 use mongodb::bson::oid::ObjectId;
-use mongodb::bson::{to_document, doc, extjson::de::Error as BsonError};
+use mongodb::bson::{DateTime,to_document, doc, extjson::de::Error as BsonError};
 use mongodb::error::Error as MongoDbError;
 use crate::infrastructure::database::{schemas::user_schema::{User,OptionUser},connection::Model};
-
+use crate::port::query_filter::QueryOptions;
 #[derive(Clone)]
 pub struct GestorRepository{
     model: Box<Model<User>>,
@@ -14,32 +14,35 @@ impl GestorRepository {
         }
     }
     pub async fn get_one(&self, user: OptionUser) -> Result<Option<User>,BsonError> {
-        let filter = to_document(&user).ok().expect("error converting to document");
+        let filter = to_document(&user).expect("error converting to document");
         self.model.find_one(filter).await
     }
-    pub async fn get_all(&self, mut user: OptionUser, ) -> Result<Vec<User>,BsonError> {
+    pub async fn get_all(&self, mut user: OptionUser, options: QueryOptions) -> Result<Vec<User>,BsonError> {
         user.user_type = Some("gestor".to_string());
-        let filter = to_document(&user).ok().expect("error converting to document");
-        self.model.find(filter).await
+        let filter = to_document(&user).expect("error converting to document");
+        self.model.find(filter, options).await
     }
     pub async fn create<'a>(&self, mut user: Box<User>) ->  Result<Option<Box<User>>,MongoDbError> {
         user.id = None;
         user.user_type = "gestor".to_string();
+        user.created_at = Some(DateTime::now());
+        user.updated_at = Some(DateTime::now());
         self.model.create(&user).await.map(|op| {
             user.id = op;
-            return Some(user);
+            Some(user)
         })
     }
     pub async fn update_one<'a>(&self, mut user: Box<OptionUser>, id: ObjectId) ->  Result<Option<User>,BsonError> {
         user.id = None;
         user.user_type = None;
+        user.created_at = None;
+        user.updated_at = Some(DateTime::now());
         match self.model.update_one(user, id).await {
             Ok(up) => {
                 if up.upserted_id.is_some() {
-                    return self.model.find_one(doc!{"_id": Some(up.upserted_id)}).await
-                        .map(|us| us);
+                    self.model.find_one(doc!{"_id": Some(up.upserted_id)}).await
                 } else{
-                    return Ok(None);
+                    Ok(None)
                 }
             },
             Err(err) => Err(err),

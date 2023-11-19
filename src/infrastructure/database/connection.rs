@@ -1,6 +1,6 @@
 use mongodb::{
     bson::{doc, extjson::de::Error as BsonError, oid::ObjectId, to_bson, Document},
-    results::{UpdateResult,DeleteResult},
+    results::UpdateResult,
     options::FindOptions,
     Client, options::ClientOptions,
 };
@@ -8,12 +8,14 @@ use mongodb::error::Error as MongoDbError;
 use futures::stream::TryStreamExt;
 
 
-use serde::{Deserialize, Serialize, de::DeserializeOwned};
+use serde::{Serialize, de::DeserializeOwned};
+
+use crate::port::query_filter::QueryOptions;
 
 pub async fn get_connection(uri: &str) -> Result<Client, mongodb::error::Error> {
     let mut client_options = ClientOptions::parse(uri).await?;
     client_options.app_name = Some("My App".to_string());
-    return Client::with_options(client_options);
+    Client::with_options(client_options)
 }
 #[derive(Clone)]
 pub struct Model<T>{
@@ -33,19 +35,19 @@ impl<T> Model<T>  {
     {
         let result= self.collection.find_one(
             filter, None
-        ).await.ok().expect("Error on creating operation");
+        ).await.expect("Error on creating operation");
         Ok(result)
     }
 
-    pub async fn find(&self, filter: Document) -> Result<Vec<T>, BsonError>
+    pub async fn find(&self, filter: Document, opt: QueryOptions) -> Result<Vec<T>, BsonError>
     where
     T: DeserializeOwned + Unpin + Send + Sync + Serialize + std::fmt::Debug,
     {
         let mut result: Vec<T> = Vec::new();
-        let options = FindOptions::builder().limit(10).build();
+        let options: Option<FindOptions> = Some(opt.into());
         let mut cursor= self.collection.find(
             filter, options
-        ).await.ok().expect("Error on find operation");
+        ).await.expect("Error on find operation");
         
         while let Ok(Some(item)) = cursor.try_next().await {
             result.push(item)
@@ -77,10 +79,10 @@ impl<T> Model<T>{
     where
     G: Serialize + std::convert::From<G>,
     {
-        let d = to_bson::<G>(&data).ok().expect("Error on bson conversion");
+        let d = to_bson::<G>(&data).expect("Error on bson conversion");
         let result= self.collection.update_one(
             doc!{ "_id": id }, doc!{"$set": d}, None
-        ).await.ok().expect("Error on creating operation");
+        ).await.expect("Error on creating operation");
         Ok(result)
     }
 }

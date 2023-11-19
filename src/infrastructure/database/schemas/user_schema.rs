@@ -1,6 +1,5 @@
 use serde::{Deserialize, Serialize};
-use mongodb::bson::oid::ObjectId;
-use mongodb::{bson::extjson::de::Error,results::InsertOneResult};
+use mongodb::bson::{DateTime,oid::ObjectId};
 
 // #[serde(rename_all = "camelCase")]
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -12,12 +11,8 @@ pub struct User {
     pub user_type: String,
     pub email: String,
     pub matricula: Option<String>,
-}
-impl Into<User> for InsertOneResult{
-    fn into(self) -> User {
-        self.into()
-    }
-    
+    pub created_at: Option<DateTime>,
+    pub updated_at: Option<DateTime>,
 }
 //#[serde(rename_all = "camelCase")]
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -33,4 +28,8 @@ pub struct OptionUser {
     pub email: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub matricula: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<DateTime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<DateTime>,
 }

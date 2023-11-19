@@ -20,7 +20,7 @@ pub struct AppError {
 
 impl AppError {
     pub fn message(&self) -> String {
-        match &*self {
+        match self {
             AppError {
                 message: Some(message),
                 ..
@@ -94,16 +94,15 @@ impl ResponseError for AppError {
     }
     fn error_response(&self) -> HttpResponse {
         if let Some(message) = &self.cause {
-            return HttpResponse::build(self.status_code()).json(AppErrorResponse {
+            HttpResponse::build(self.status_code()).json(AppErrorResponse {
                 error: self.message(),
                 message: Some(message.to_string())
             })
         } else {
-            return HttpResponse::build(self.status_code()).json(AppErrorResponse {
+            HttpResponse::build(self.status_code()).json(AppErrorResponse {
                 error: self.message(),
                 message: None
             })
         }
-        
     }
 }

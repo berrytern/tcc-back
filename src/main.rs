@@ -18,12 +18,12 @@ use utils::settings::load_env;
 
 /*#[tokio::main]
 async fn main() {
-    let client = get_connection("mongodb://admin:admin@localhost:27017/").await.ok().expect("Cannot connect to MongoDb");
+    let client = get_connection("mongodb://admin:admin@localhost:27017/").await.expect("Cannot connect to MongoDb");
     let db = client.database("teste");
     let userModel = Model::<User>::new(db, "users").await;
     
     let result = userModel.find(doc!{
-        "name": "jose".to_string()}.into()).await.ok().expect("err");
+        "name": "jose".to_string()}.into()).await.expect("err");
     println!("result: {:?}", result);
 }*/
 
