@@ -39,15 +39,16 @@ impl<T> Model<T>  {
 
     pub async fn find(&self, filter: Document) -> Result<Vec<T>, BsonError>
     where
-    T: DeserializeOwned + Unpin + Send + Sync + Serialize,
+    T: DeserializeOwned + Unpin + Send + Sync + Serialize + std::fmt::Debug,
     {
         let mut result: Vec<T> = Vec::new();
         let options = FindOptions::builder().limit(10).build();
         let mut cursor= self.collection.find(
             filter, options
         ).await.ok().expect("Error on find operation");
-        while let Some(book) = cursor.try_next().await.ok().expect("Iteration Error") {
-            result.push(book)
+        
+        while let Ok(Some(item)) = cursor.try_next().await {
+            result.push(item)
         }
         Ok(result)
     }

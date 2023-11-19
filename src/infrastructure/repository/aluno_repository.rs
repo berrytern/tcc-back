@@ -4,12 +4,12 @@ use mongodb::error::Error as MongoDbError;
 use crate::infrastructure::database::{schemas::user_schema::{User,OptionUser},connection::Model};
 
 #[derive(Clone)]
-pub struct GestorRepository{
+pub struct AlunoRepository{
     model: Box<Model<User>>,
 }
-impl GestorRepository {
+impl AlunoRepository {
     pub fn new(model: Box<Model<User>>)-> Self{
-        GestorRepository {
+        AlunoRepository {
             model
         }
     }
@@ -18,13 +18,13 @@ impl GestorRepository {
         self.model.find_one(filter).await
     }
     pub async fn get_all(&self, mut user: OptionUser, ) -> Result<Vec<User>,BsonError> {
-        user.user_type = Some("gestor".to_string());
+        user.user_type = Some("aluno".to_string());
         let filter = to_document(&user).ok().expect("error converting to document");
         self.model.find(filter).await
     }
     pub async fn create<'a>(&self, mut user: Box<User>) ->  Result<Option<Box<User>>,MongoDbError> {
         user.id = None;
-        user.user_type = "gestor".to_string();
+        user.user_type = "aluno".to_string();
         self.model.create(&user).await.map(|op| {
             user.id = op;
             return Some(user);
@@ -46,7 +46,7 @@ impl GestorRepository {
         }
     }
     pub async fn delete_one<'a>(&self, id: ObjectId) -> Result<bool,MongoDbError> {
-        let filter = doc!{"_id": id, "user_type": "gestor"};
+        let filter = doc!{"_id": id, "user_type": "aluno"};
         self.model.delete_one(filter).await
     }
 }

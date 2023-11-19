@@ -1,12 +1,14 @@
 use crate::infrastructure::database::schemas::user_schema::OptionUser;
-use crate::infrastructure::repository::gestor_repository::GestorRepository;
+use crate::infrastructure::repository::{aluno_repository::AlunoRepository,gestor_repository::GestorRepository,professor_repository::ProfessorRepository};
 use crate::infrastructure::database::{schemas::user_schema::User,connection::{Model, get_connection}};
 use crate::utils::settings::Env;
 
 
 #[derive(Clone)]
 pub struct Repository{
-    pub gestor: GestorRepository
+    pub aluno: AlunoRepository,
+    pub gestor: GestorRepository,
+    pub professor: ProfessorRepository
 }
 
 #[derive(Clone)]
@@ -22,7 +24,9 @@ pub async fn build(env: &Env) -> App{
    
     App{
         repositories: Repository{
-            gestor: GestorRepository::new(Box::new(user_model)),
+            aluno: AlunoRepository::new(Box::new(user_model.clone())),
+            gestor: GestorRepository::new(Box::new(user_model.clone())),
+            professor: ProfessorRepository::new(Box::new(user_model.clone())),
         },
     }
 }

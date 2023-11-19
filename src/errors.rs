@@ -2,6 +2,7 @@ use actix_web::{error::ResponseError, http::StatusCode, HttpResponse};
 use serde::Serialize;
 use std::fmt;
 use mongodb::bson::extjson::de::Error as BsonError;
+use mongodb::bson::oid::Error as OidError;
 use mongodb::error::Error as MongoDbError;
 
 #[derive(Debug)]
@@ -43,6 +44,15 @@ impl From<BsonError> for AppError {
         }
     }
 }
+impl From<OidError> for AppError {
+    fn from(error: OidError) -> AppError {
+        AppError {
+            message: None, 
+            cause: Some(error.to_string()),
+            error_type: AppErrorType::ValidationError
+        }
+    }
+}
 impl From<MongoDbError> for AppError {
     fn from(error: MongoDbError) -> AppError {
         AppError {
@@ -71,6 +81,8 @@ impl fmt::Display for AppError {
 #[derive(Serialize)]
 pub struct AppErrorResponse {
     pub error: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub message: Option<String>,
 }
 
 impl ResponseError for AppError {
@@ -81,8 +93,17 @@ impl ResponseError for AppError {
         }
     }
     fn error_response(&self) -> HttpResponse {
-        HttpResponse::build(self.status_code()).json(AppErrorResponse {
-            error: self.message(),
-        })
+        if let Some(message) = &self.cause {
+            return HttpResponse::build(self.status_code()).json(AppErrorResponse {
+                error: self.message(),
+                message: Some(message.to_string())
+            })
+        } else {
+            return HttpResponse::build(self.status_code()).json(AppErrorResponse {
+                error: self.message(),
+                message: None
+            })
+        }
+        
     }
 }
