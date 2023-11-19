@@ -22,7 +22,7 @@ pub struct Model<T>{
 
 impl<T,F> Model<T>  {
     pub async fn new(db: mongodb::Database, collection_name: &str) ->  Self {
-        Model::<T, F>{
+        Model::<T>{
             collection: db.collection::<T>(collection_name)
         }
     }
