@@ -33,7 +33,7 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         println!("running");
         App::new()
-            .app_data(Data::new(app))
+            .app_data(Data::new(app.clone()))
             .route("/gestor", get().to(get_all_gestor))
             .route("/gestor", post().to(create_gestor))
             .route("/gestor/{id}", get().to(get_gestor))

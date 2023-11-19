@@ -20,7 +20,7 @@ pub struct Model<T>{
     collection: mongodb::Collection<T>,
 }
 
-impl<T,F> Model<T>  {
+impl<T> Model<T>  {
     pub async fn new(db: mongodb::Database, collection_name: &str) ->  Self {
         Model::<T>{
             collection: db.collection::<T>(collection_name)
@@ -62,17 +62,6 @@ impl<T,F> Model<T>  {
             .map(|op| Some(op.inserted_id.as_object_id().unwrap()))
     }
 
-    pub async fn update_one(&self, data: F, id: ObjectId) -> Result<UpdateResult, BsonError> 
-    where
-    T: Serialize + std::convert::From<F>,
-    {
-        let d = to_bson::<F>(&data).ok().expect("Error on bson conversion");
-        let result= self.collection.update_one(
-            doc!{ "_id": id }, doc!{"$set": d}, None
-        ).await.ok().expect("Error on creating operation");
-        Ok(result)
-    }
-
     pub async fn delete_one(&self, filter: Document) -> Result<bool, MongoDbError>
     where
     T: Serialize,
@@ -81,4 +70,16 @@ impl<T,F> Model<T>  {
             .map(|result| result.deleted_count != 0)
     }
 
+}
+impl<T> Model<T>{
+    pub async fn update_one<G>(&self, data: G, id: ObjectId) -> Result<UpdateResult, BsonError> 
+    where
+    G: Serialize + std::convert::From<G>,
+    {
+        let d = to_bson::<G>(&data).ok().expect("Error on bson conversion");
+        let result= self.collection.update_one(
+            doc!{ "_id": id }, doc!{"$set": d}, None
+        ).await.ok().expect("Error on creating operation");
+        Ok(result)
+    }
 }

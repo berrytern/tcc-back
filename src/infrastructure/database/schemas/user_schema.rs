@@ -29,9 +29,9 @@ impl Into<User> for InsertOneResult{
 pub struct OptionUser {
     #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
     pub id: Option<ObjectId>,
-    pub name: String,
+    pub name: Option<String>,
     #[serde(alias = "type")]
-    pub user_type: String,
-    pub email: String,
+    pub user_type: Option<String>,
+    pub email: Option<String>,
     pub matricula: Option<String>,
 }
