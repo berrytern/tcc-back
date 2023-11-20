@@ -1,14 +1,20 @@
 use mongodb::bson::oid::ObjectId;
-use mongodb::bson::{DateTime,to_document, doc, extjson::de::Error as BsonError};
+use mongodb::{IndexModel,
+    bson::{DateTime,to_document, doc, extjson::de::Error as BsonError},
+    options::IndexOptions};
 use mongodb::error::Error as MongoDbError;
 use crate::infrastructure::database::{schemas::user_schema::{User,OptionUser},connection::Model};
 use crate::port::query_filter::QueryOptions;
+
 #[derive(Clone)]
 pub struct GestorRepository{
     model: Box<Model<User>>,
 }
 impl GestorRepository {
-    pub fn new(model: Box<Model<User>>)-> Self{
+    pub async fn new(model: Box<Model<User>>)-> Self{
+        let options = IndexOptions::builder().unique(true).build();
+        let index = IndexModel::builder().keys(doc!{"email":1}).options(options).build();
+        let _ = model.create_index(index, None).await;
         GestorRepository {
             model
         }
@@ -24,6 +30,7 @@ impl GestorRepository {
     }
     pub async fn create<'a>(&self, mut user: Box<User>) ->  Result<Option<Box<User>>,MongoDbError> {
         user.id = None;
+        user.matricula = None;
         user.user_type = "gestor".to_string();
         user.created_at = Some(DateTime::now());
         user.updated_at = Some(DateTime::now());
@@ -35,12 +42,14 @@ impl GestorRepository {
     pub async fn update_one<'a>(&self, mut user: Box<OptionUser>, id: ObjectId) ->  Result<Option<User>,BsonError> {
         user.id = None;
         user.user_type = None;
+        user.matricula = None;
         user.created_at = None;
         user.updated_at = Some(DateTime::now());
-        match self.model.update_one(user, id).await {
+        let filter = doc!{"_id":id};
+        match self.model.update_one(user, filter).await {
             Ok(up) => {
-                if up.upserted_id.is_some() {
-                    self.model.find_one(doc!{"_id": Some(up.upserted_id)}).await
+                if up.matched_count != 0 {
+                    self.model.find_one(doc!{"_id": id}).await
                 } else{
                     Ok(None)
                 }

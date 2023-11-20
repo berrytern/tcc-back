@@ -1,5 +1,7 @@
 use mongodb::bson::oid::ObjectId;
-use mongodb::bson::{DateTime,to_document, doc, extjson::de::Error as BsonError};
+use mongodb::{IndexModel,
+    bson::{DateTime,to_document, doc, extjson::de::Error as BsonError},
+    options::IndexOptions};
 use mongodb::error::Error as MongoDbError;
 use crate::infrastructure::database::{schemas::user_schema::{User,OptionUser},connection::Model};
 use crate::port::query_filter::QueryOptions;
@@ -10,7 +12,10 @@ pub struct ProfessorRepository{
     model: Box<Model<User>>,
 }
 impl ProfessorRepository {
-    pub fn new(model: Box<Model<User>>)-> Self{
+    pub async fn new(model: Box<Model<User>>)-> Self{
+        let options = IndexOptions::builder().unique(true).build();
+        let index = IndexModel::builder().keys(doc!{"email":1}).options(options).build();
+        let _ = model.create_index(index, None).await;
         ProfessorRepository {
             model
         }
@@ -39,10 +44,11 @@ impl ProfessorRepository {
         user.user_type = None;
         user.created_at = None;
         user.updated_at = Some(DateTime::now());
-        match self.model.update_one(user, id).await {
+        let filter = doc!{"_id":id};
+        match self.model.update_one(user, filter).await {
             Ok(up) => {
-                if up.upserted_id.is_some() {
-                    self.model.find_one(doc!{"_id": Some(up.upserted_id)}).await
+                if up.matched_count != 0 {
+                    self.model.find_one(doc!{"_id": id}).await
                 } else{
                     Ok(None)
                 }

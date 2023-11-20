@@ -1,8 +1,8 @@
 use mongodb::{
     bson::{doc, extjson::de::Error as BsonError, oid::ObjectId, to_bson, Document},
-    results::UpdateResult,
+    results::{UpdateResult, CreateIndexResult},
     options::FindOptions,
-    Client, options::ClientOptions,
+    Client, options::{ClientOptions, CreateIndexOptions}, IndexModel,
 };
 use mongodb::error::Error as MongoDbError;
 use futures::stream::TryStreamExt;
@@ -23,10 +23,14 @@ pub struct Model<T>{
 }
 
 impl<T> Model<T>  {
-    pub async fn new(db: mongodb::Database, collection_name: &str) ->  Self {
+    pub async fn new(db: &mongodb::Database, collection_name: &str) ->  Self {
         Model::<T>{
             collection: db.collection::<T>(collection_name)
         }
+    }
+
+    pub async fn create_index(&self, index: IndexModel, opt: Option<CreateIndexOptions>)-> Result<CreateIndexResult, MongoDbError>{
+        self.collection.create_index(index, opt).await
     }
 
     pub async fn find_one(&self, filter: Document) -> Result<Option<T>, BsonError>
@@ -75,13 +79,13 @@ impl<T> Model<T>  {
 
 }
 impl<T> Model<T>{
-    pub async fn update_one<G>(&self, data: G, id: ObjectId) -> Result<UpdateResult, BsonError> 
+    pub async fn update_one<G>(&self, data: G, filter: Document) -> Result<UpdateResult, BsonError> 
     where
     G: Serialize + std::convert::From<G>,
     {
         let d = to_bson::<G>(&data).expect("Error on bson conversion");
         let result= self.collection.update_one(
-            doc!{ "_id": id }, doc!{"$set": d}, None
+            filter, doc!{"$set": d}, None
         ).await.expect("Error on creating operation");
         Ok(result)
     }

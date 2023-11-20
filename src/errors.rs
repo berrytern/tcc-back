@@ -4,11 +4,13 @@ use std::fmt;
 use mongodb::bson::extjson::de::Error as BsonError;
 use mongodb::bson::oid::Error as OidError;
 use mongodb::error::Error as MongoDbError;
+use mongodb::error::{WriteFailure,WriteConcernError,WriteError};
 
 #[derive(Debug)]
 pub enum AppErrorType {
-    DbError,
+    InternalError,
     ValidationError,
+    ConflictError,
 }
 
 #[derive(Debug)]
@@ -17,7 +19,9 @@ pub struct AppError {
     pub cause: Option<String>,
     pub error_type: AppErrorType,
 }
-
+impl std::error::Error for AppError {
+    
+}
 impl AppError {
     pub fn message(&self) -> String {
         match self {
@@ -30,7 +34,20 @@ impl AppError {
                 error_type: AppErrorType::ValidationError,
                 ..
             } => "The body content is invalid".to_string(),
+            AppError {
+                error_type: AppErrorType::ConflictError,
+                ..
+            } => "Unique field value already in used".to_string(),
             _ => "An unexpected error has occurred".to_string(),
+        }
+    }
+}
+impl From<Box<dyn std::error::Error>> for AppError {
+    fn from(error: Box<dyn std::error::Error>) -> AppError {
+        AppError {
+            message: None, 
+            cause: Some(error.to_string()),
+            error_type: AppErrorType::ValidationError
         }
     }
 }
@@ -40,7 +57,34 @@ impl From<BsonError> for AppError {
         AppError {
             message: None, 
             cause: Some(error.to_string()),
-            error_type: AppErrorType::DbError
+            error_type: AppErrorType::ValidationError
+        }
+    }
+}
+impl From<WriteFailure> for AppError {
+    fn from(_error: WriteFailure) -> AppError {
+        AppError {
+            message: None, 
+            cause: None,
+            error_type: AppErrorType::ConflictError
+        }
+    }
+}
+impl From<WriteConcernError> for AppError {
+    fn from(_error: WriteConcernError) -> AppError {
+        AppError {
+            message: None, 
+            cause: None,
+            error_type: AppErrorType::ConflictError
+        }
+    }
+}
+impl From<WriteError> for AppError {
+    fn from(_error: WriteError) -> AppError {
+        AppError {
+            message: None, 
+            cause: None,
+            error_type: AppErrorType::ConflictError
         }
     }
 }
@@ -58,16 +102,7 @@ impl From<MongoDbError> for AppError {
         AppError {
             message: None, 
             cause: Some(error.to_string()),
-            error_type: AppErrorType::DbError
-        }
-    }
-}
-impl From<Box<dyn std::error::Error>> for AppError {
-    fn from(error: Box<dyn std::error::Error>) -> AppError {
-        AppError {
-            message: None, 
-            cause: Some(error.to_string()),
-            error_type: AppErrorType::DbError
+            error_type: AppErrorType::ValidationError,
         }
     }
 }
@@ -88,8 +123,9 @@ pub struct AppErrorResponse {
 impl ResponseError for AppError {
     fn status_code(&self) -> StatusCode {
         match self.error_type {
-            AppErrorType::DbError => StatusCode::INTERNAL_SERVER_ERROR,
+            AppErrorType::InternalError => StatusCode::INTERNAL_SERVER_ERROR,
             AppErrorType::ValidationError => StatusCode::BAD_REQUEST,
+            AppErrorType::ConflictError => StatusCode::CONFLICT,
         }
     }
     fn error_response(&self) -> HttpResponse {
