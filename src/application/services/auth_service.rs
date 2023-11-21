@@ -1,20 +1,16 @@
 use crate::application::models::access_token::AccessToken;
 use crate::application::models::json_token::JsonToken;
 use crate::application::models::login::Login;
-use crate::errors::AppErrorResponse;
 use crate::infrastructure::database::schemas::user_schema::OptionUser;
 use crate::{
     errors::AppError,
-    infrastructure::{
-        database::schemas::auth_schema::{OptionAuth, Auth},
-        repository::{auth_repository::AuthRepository,
+    infrastructure::repository::{auth_repository::AuthRepository,
                     user_repository::UserRepository},
-    },
 };
 use crate::application::utils::user_scopes::UserScope;
 use crate::utils::default::MAX_EXP;
 use jsonwebtoken::{decode, encode, get_current_timestamp, Algorithm, DecodingKey, EncodingKey, Header, Validation};
-use pwhash::bcrypt;
+use pwhash::bcrypt::{self, BcryptSetup, BcryptVariant};
 
 #[derive(Clone)]
 pub struct AuthService {
@@ -30,7 +26,7 @@ impl AuthService {
         }
     }
 
-    pub async fn login(&self, login: Login, secret: &str) -> Result<AccessToken, AppError> {
+    pub async fn login(&self, login: Login, secret: &str, salt: &str) -> Result<AccessToken, AppError> {
         let mut option: OptionUser = login.clone().into();
         if let Some(user) = self.user_repository.get_one(&mut(option)).await?{
             // hash compare
@@ -50,7 +46,9 @@ impl AuthService {
                     let access_token = &encode(&Header::default(), &json_token, &EncodingKey::from_secret(secret.as_bytes()))?;
                     return Ok(AccessToken{
                         access_token: access_token.to_string(),
-                        refresh_token: bcrypt::hash(access_token)?, 
+                        refresh_token: bcrypt::hash_with(BcryptSetup{
+                            salt:None,cost: Some(14),variant:None},
+                            access_token)?, 
                     });
                 }
             } else {
@@ -61,7 +59,4 @@ impl AuthService {
         }
         Err(AppError::new(Some("".to_string()),Some("".to_string()),crate::errors::AppErrorType::ValidationError))
     }
-    // pub async refresh_token(&self, refresh_token:) -> Result<Option<AccessToken>, AppError>{
-
-    //}
 }

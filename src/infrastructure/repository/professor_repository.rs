@@ -36,7 +36,7 @@ impl ProfessorRepository {
             Some(user)
         })
     }
-    pub async fn update_one<'a>(&self, mut user: Box<OptionUser>, id: &ObjectId) ->  Result<Option<User>,BsonError> {
+    pub async fn update_one<'a>(&self, user: Box<OptionUser>, id: &ObjectId) ->  Result<Option<User>,BsonError> {
         let filter = doc!{"_id":id};
         match self.model.update_one(user, filter, None).await {
             Ok(up) => {

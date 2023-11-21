@@ -41,6 +41,8 @@ services:
     environment:
       - WORKERS=2
       - MONGODB_URI=mongodb://admin:admin@mongo:27017/
+      - JWT_SECRET=${JWT_SECRET}
+      - HASH_SALT=${HASH_SALT}
     ports:
       - 8080:8080
     networks: 

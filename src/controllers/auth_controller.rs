@@ -17,10 +17,10 @@ impl AuthController {
         AuthController { service }
     }
 
-    pub async fn login(&self, user: Login, secret: &str) -> Result<HttpResponse, AppError> {
+    pub async fn login(&self, user: Login, secret: &str, salt: &str) -> Result<HttpResponse, AppError> {
         Ok(self
             .service
-            .login(user, secret)
+            .login(user, secret, salt)
             .await
             .map(|result| HttpResponse::Ok().json(result))?)
     }
