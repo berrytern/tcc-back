@@ -1,7 +1,7 @@
 use mongodb::{
     bson::{doc, extjson::de::Error as BsonError, oid::ObjectId, to_bson, Document},
     results::{UpdateResult, CreateIndexResult},
-    options::FindOptions,
+    options::{FindOptions, UpdateOptions},
     Client, options::{ClientOptions, CreateIndexOptions}, IndexModel,
 };
 use mongodb::error::Error as MongoDbError;
@@ -79,13 +79,13 @@ impl<T> Model<T>  {
 
 }
 impl<T> Model<T>{
-    pub async fn update_one<G>(&self, data: G, filter: Document) -> Result<UpdateResult, BsonError> 
+    pub async fn update_one<G>(&self, data: G, filter: Document, options: Option<UpdateOptions>) -> Result<UpdateResult, BsonError> 
     where
     G: Serialize + std::convert::From<G>,
     {
         let d = to_bson::<G>(&data).expect("Error on bson conversion");
         let result= self.collection.update_one(
-            filter, doc!{"$set": d}, None
+            filter, doc!{"$set": d}, options
         ).await.expect("Error on creating operation");
         Ok(result)
     }

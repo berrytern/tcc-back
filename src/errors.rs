@@ -5,6 +5,7 @@ use mongodb::bson::extjson::de::Error as BsonError;
 use mongodb::bson::oid::Error as OidError;
 use mongodb::error::Error as MongoDbError;
 use mongodb::error::{WriteFailure,WriteConcernError,WriteError};
+use pwhash;
 
 #[derive(Debug)]
 pub enum AppErrorType {
@@ -23,6 +24,13 @@ impl std::error::Error for AppError {
     
 }
 impl AppError {
+    pub fn new(cause: Option<String>, message: Option<String>, error_type: AppErrorType) -> AppError {
+        AppError {
+            cause,
+            message,
+            error_type,
+        }
+    }
     pub fn message(&self) -> String {
         match self {
             AppError {
@@ -51,7 +59,24 @@ impl From<Box<dyn std::error::Error>> for AppError {
         }
     }
 }
-
+impl From<pwhash::error::Error> for AppError {
+    fn from(error: pwhash::error::Error) -> Self {
+        AppError {
+            message: None, 
+            cause: Some(error.to_string()),
+            error_type: AppErrorType::ValidationError
+        }
+    }
+}
+impl From<jsonwebtoken::errors::Error> for AppError {
+    fn from(error: jsonwebtoken::errors::Error) -> AppError {
+        AppError {
+            message: None, 
+            cause: Some(error.to_string()),
+            error_type: AppErrorType::ValidationError
+        }
+    }
+}
 impl From<BsonError> for AppError {
     fn from(error: BsonError) -> AppError {
         AppError {

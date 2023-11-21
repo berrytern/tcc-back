@@ -10,6 +10,7 @@ use crate::{
     port::query_filter::QueryOptions,
 };
 use mongodb::bson::oid::ObjectId;
+use pwhash::bcrypt;
 
 #[derive(Clone)]
 pub struct AlunoService {
@@ -21,12 +22,12 @@ impl AlunoService {
         AlunoService { repository }
     }
 
-    pub async fn get_one(&self, user: &OptionUser) -> Result<Option<User>, AppError> {
+    pub async fn get_one(&self, user: &mut OptionUser) -> Result<Option<User>, AppError> {
         Ok(self.repository.get_one(user).await?)
     }
     pub async fn get_all_aluno(
         &self,
-        user: OptionUser,
+        user: &mut OptionUser,
         options: QueryOptions,
     ) -> Result<Vec<User>, AppError> {
         Ok(self
@@ -37,6 +38,7 @@ impl AlunoService {
 
     pub async fn create_aluno(&self, mut user: Box<User>) -> Result<Option<Box<User>>, AppError> {
         CreateUserValidation::validate(&mut (*user))?;
+        user.password = bcrypt::hash(user.password)?;
         user.user_type = "aluno".to_string();
         Ok(self.repository.create(user).await?)
     }

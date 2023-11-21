@@ -4,27 +4,27 @@ use crate::{infrastructure::database::schemas::turma_schema::{OptionTurma, Turma
 use crate::di::d_injection::App;
 use crate::routes::handler::HANDLER;
 
-
+// tr:r
 pub async fn get_one_turma(app: Data<App>, query: Query<OptionTurma>) -> Result<impl Responder, AppError> {
     let controller = &app.controllers.turma;
     let turma = query.into_inner();
     controller.get_one(&turma).await
         .map_err(|err| HANDLER(Box::new(err)))
 }
-
+// tr:r
 pub async fn get_all_turma(app: Data<App>, query: Query<OptionTurma>, opt: Query<QueryFilter>) -> Result<impl Responder, AppError> {
     let controller = &app.controllers.turma;
     let turma = query.into_inner();
     controller.get_all_turma(&turma, opt.into_inner().into()).await
         .map_err(|err| HANDLER(Box::new(err)))
 }
-
+// tr:c
 pub async fn create_turma(app: Data<App>, turma: Json<Turma>) -> Result<impl Responder, AppError> {
     let controller = &app.controllers.turma;
     controller.create_turma(Box::new(turma.into_inner())).await
         .map_err(|err| HANDLER(Box::new(err)))
 }
-
+// tr:u
 pub async fn update_turma(app: Data<App>, turma: Json<OptionTurma>, ids: Path<(String,String)>) -> Result<impl Responder, AppError> {
     let controller = &app.controllers.turma;
     let (aluno_id, professor_id) = ids.into_inner();
@@ -35,7 +35,7 @@ pub async fn update_turma(app: Data<App>, turma: Json<OptionTurma>, ids: Path<(S
     ).await
         .map_err(|err| HANDLER(Box::new(err)))
 }
-
+// tr:d
 pub async fn delete_turma(app: Data<App>, ids: Path<(String,String)>) -> Result<impl Responder, AppError> {
     let controller = &app.controllers.turma;
     let (aluno_id, professor_id) = ids.into_inner();

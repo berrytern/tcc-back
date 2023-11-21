@@ -4,27 +4,27 @@ use crate::{infrastructure::database::schemas::solicitacao_schema::{OptionSolici
 use crate::di::d_injection::App;
 use crate::routes::handler::HANDLER;
 
-
+// pf:r
 pub async fn get_one_solicitacao(app: Data<App>, query: Query<OptionSolicitacao>) -> Result<impl Responder, AppError> {
     let controller = &app.controllers.solicitacao;
     let solicitacao = query.into_inner();
     controller.get_one(&solicitacao).await
         .map_err(|err| HANDLER(Box::new(err)))
 }
-
+// pf:r
 pub async fn get_all_solicitacao(app: Data<App>, query: Query<OptionSolicitacao>, opt: Query<QueryFilter>) -> Result<impl Responder, AppError> {
     let controller = &app.controllers.solicitacao;
     let solicitacao = query.into_inner();
     controller.get_all_solicitacao(&solicitacao, opt.into_inner().into()).await
         .map_err(|err| HANDLER(Box::new(err)))
 }
-
+// pf:c
 pub async fn create_solicitacao(app: Data<App>, solicitacao: Json<Solicitacao>) -> Result<impl Responder, AppError> {
     let controller = &app.controllers.solicitacao;
     controller.create_solicitacao(Box::new(solicitacao.into_inner())).await
         .map_err(|err| HANDLER(Box::new(err)))
 }
-
+// pf:u
 pub async fn update_solicitacao(app: Data<App>, solicitacao: Json<OptionSolicitacao>, ids: Path<(String,String)>) -> Result<impl Responder, AppError> {
     let controller = &app.controllers.solicitacao;
     let (aluno_id, professor_id) = ids.into_inner();
@@ -35,7 +35,7 @@ pub async fn update_solicitacao(app: Data<App>, solicitacao: Json<OptionSolicita
     ).await
         .map_err(|err| HANDLER(Box::new(err)))
 }
-
+// pf:d
 pub async fn delete_solicitacao(app: Data<App>, ids: Path<(String,String)>) -> Result<impl Responder, AppError> {
     let controller = &app.controllers.solicitacao;
     let (aluno_id, professor_id) = ids.into_inner();

@@ -1,4 +1,5 @@
 use mongodb::bson::oid::ObjectId;
+use pwhash::bcrypt;
 use crate::application::validation::create_user_validation::CreateUserValidation;
 use crate::application::validation::update_user_validation::UpdateUserValidation;
 use crate::{infrastructure::{repository::gestor_repository::GestorRepository, database::schemas::user_schema::{User, OptionUser}}, errors::AppError, port::query_filter::QueryOptions};
@@ -15,15 +16,16 @@ impl GestorService {
         }
     }
 
-    pub async fn get_one(&self, user: &OptionUser) -> Result<Option<User>, AppError> {
+    pub async fn get_one(&self, user: &mut OptionUser) -> Result<Option<User>, AppError> {
         Ok(self.repository.get_one(user).await?)
     }
-    pub async fn get_all_gestor(&self, user: OptionUser, options: QueryOptions) -> Result<Vec<User>, AppError> {
+    pub async fn get_all_gestor(&self, user: &mut OptionUser, options: QueryOptions) -> Result<Vec<User>, AppError> {
         Ok(self.repository.get_all(user, options).await?)
     }
     
     pub async fn create_gestor(&self, mut user: Box<User>) -> Result<Option<Box<User>>, AppError> {
         CreateUserValidation::validate(&mut(*user))?;
+        user.password = bcrypt::hash(user.password)?;
         user.user_type = "gestor".to_string();
         user.matricula = None;
         Ok(self.repository.create(user).await?)

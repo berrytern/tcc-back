@@ -1,4 +1,5 @@
 use mongodb::bson::oid::ObjectId;
+use pwhash::bcrypt;
 use crate::application::validation::create_user_validation::CreateUserValidation;
 use crate::application::validation::update_user_validation::UpdateUserValidation;
 use crate::{infrastructure::{repository::professor_repository::ProfessorRepository, database::schemas::user_schema::{User, OptionUser}}, errors::AppError, port::query_filter::QueryOptions};
@@ -15,15 +16,16 @@ impl ProfessorService {
         }
     }
 
-    pub async fn get_one(&self, user: &OptionUser) -> Result<Option<User>, AppError> {
+    pub async fn get_one(&self, user: &mut OptionUser) -> Result<Option<User>, AppError> {
         Ok(self.repository.get_one(user).await?)
     }
-    pub async fn get_all_professor(&self, user: OptionUser, options: QueryOptions) -> Result<Vec<User>, AppError> {
+    pub async fn get_all_professor(&self, user: &mut OptionUser, options: QueryOptions) -> Result<Vec<User>, AppError> {
         Ok(self.repository.get_all(user, options).await?)
     }
     
     pub async fn create_professor(&self, mut user: Box<User>) -> Result<Option<Box<User>>, AppError> {
         CreateUserValidation::validate(&mut(*user))?;
+        user.password = bcrypt::hash(user.password)?;
         user.user_type = "professor".to_string();
         Ok(self.repository.create(user).await?)
     }

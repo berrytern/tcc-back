@@ -40,7 +40,7 @@ impl TurmaRepository {
         turma.created_at = None;
         turma.updated_at = Some(DateTime::now());
         let filter = doc!{"aluno_id":aluno_id,"professor_id":prof_id};
-        match self.model.update_one(turma, filter).await {
+        match self.model.update_one(turma, filter, None).await {
             Ok(up) => {
                 if up.matched_count != 0 {
                     self.model.find_one(doc!{"aluno_id": aluno_id, "professor_id":prof_id}).await

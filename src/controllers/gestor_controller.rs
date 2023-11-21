@@ -16,7 +16,7 @@ impl GestorController {
         GestorController { service }
     }
 
-    pub async fn get_one(&self, user: &OptionUser) -> Result<HttpResponse, AppError> {
+    pub async fn get_one(&self, user: &mut OptionUser) -> Result<HttpResponse, AppError> {
         Ok(self
             .service
             .get_one(user)
@@ -25,7 +25,7 @@ impl GestorController {
     }
     pub async fn get_all_gestor(
         &self,
-        user: OptionUser,
+        user: &mut OptionUser,
         options: QueryOptions,
     ) -> Result<HttpResponse, AppError> {
         Ok(self

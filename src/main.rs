@@ -8,6 +8,7 @@ mod utils;
 mod errors;
 use actix_web::{App, HttpServer, web::{Data,get,post,patch,delete}};
 use crate::di::d_injection::build;
+use routes::auth::login;
 use routes::aluno::{get_aluno,create_aluno,update_aluno,delete_aluno, get_all_aluno};
 use routes::gestor::{get_gestor,create_gestor,update_gestor,delete_gestor, get_all_gestor};
 use routes::professor::{get_professor,create_professor,update_professor,delete_professor, get_all_professor};
@@ -39,6 +40,7 @@ async fn main() -> std::io::Result<()> {
         println!("running");
         App::new()
             .app_data(Data::new(app.clone()))
+            .route("/auth", post().to(login))
             .route("/alunos", get().to(get_all_aluno))
             .route("/alunos", post().to(create_aluno))
             .route("/alunos/{id}", get().to(get_aluno))

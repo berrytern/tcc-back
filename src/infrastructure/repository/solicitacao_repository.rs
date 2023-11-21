@@ -46,7 +46,7 @@ impl SolicitacaoRepository {
             StatusType::validate(&status)?;
         }
         let filter = doc!{"aluno_id":aluno_id,"professor_id":prof_id};
-        match self.model.update_one(solicitacao, filter).await {
+        match self.model.update_one(solicitacao, filter, None).await {
             Ok(up) => {
                 if up.matched_count != 0 {
                     Ok(self.model.find_one(doc!{"aluno_id": aluno_id, "professor_id":prof_id}).await?)
