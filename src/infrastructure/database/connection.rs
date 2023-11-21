@@ -19,13 +19,13 @@ pub async fn get_connection(uri: &str) -> Result<Client, mongodb::error::Error> 
 }
 #[derive(Clone)]
 pub struct Model<T>{
-    collection: mongodb::Collection<T>,
+    collection: Box<mongodb::Collection<T>>,
 }
 
 impl<T> Model<T>  {
     pub async fn new(db: &mongodb::Database, collection_name: &str) ->  Self {
         Model::<T>{
-            collection: db.collection::<T>(collection_name)
+            collection: Box::new(db.collection::<T>(collection_name))
         }
     }
 

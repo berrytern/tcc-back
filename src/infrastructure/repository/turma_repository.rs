@@ -19,12 +19,12 @@ impl TurmaRepository {
             model
         }
     }
-    pub async fn get_one(&self, turma: OptionTurma) -> Result<Option<Turma>,BsonError> {
-        let filter = to_document(&turma).expect("error converting to document");
+    pub async fn get_one(&self, turma: &OptionTurma) -> Result<Option<Turma>,BsonError> {
+        let filter = to_document(turma).expect("error converting to document");
         self.model.find_one(filter).await
     }
-    pub async fn get_all(&self, turma: OptionTurma, options: QueryOptions) -> Result<Vec<Turma>,BsonError> {
-        let filter = to_document(&turma).expect("error converting to document");
+    pub async fn get_all(&self, turma: &OptionTurma, options: QueryOptions) -> Result<Vec<Turma>,BsonError> {
+        let filter = to_document(turma).expect("error converting to document");
         self.model.find(filter, options).await
     }
     pub async fn create<'a>(&self, mut turma: Box<Turma>) ->  Result<Option<Box<Turma>>,MongoDbError> {
@@ -34,7 +34,7 @@ impl TurmaRepository {
             Some(turma)
         })
     }
-    pub async fn update_one<'a>(&self, mut turma: Box<OptionTurma>, aluno_id: ObjectId, prof_id: ObjectId) ->  Result<Option<Turma>,BsonError> {
+    pub async fn update_one<'a>(&self, mut turma: Box<OptionTurma>, aluno_id: &ObjectId, prof_id: &ObjectId) ->  Result<Option<Turma>,BsonError> {
         turma.id_aluno = None;
         turma.id_professor = None;
         turma.created_at = None;
@@ -51,7 +51,7 @@ impl TurmaRepository {
             Err(err) => Err(err),
         }
     }
-    pub async fn delete_one<'a>(&self, aluno_id: ObjectId, prof_id: ObjectId) -> Result<bool,MongoDbError> {
+    pub async fn delete_one<'a>(&self, aluno_id: &ObjectId, prof_id: &ObjectId) -> Result<bool,MongoDbError> {
         let filter = doc!{"id_aluno": aluno_id, "id_professor": prof_id};
         self.model.delete_one(filter).await
     }

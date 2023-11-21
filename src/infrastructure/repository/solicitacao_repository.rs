@@ -21,12 +21,12 @@ impl SolicitacaoRepository {
             model
         }
     }
-    pub async fn get_one(&self, solicitacao: OptionSolicitacao) -> Result<Option<Solicitacao>,BsonError> {
-        let filter = to_document(&solicitacao).expect("error converting to document");
+    pub async fn get_one(&self, solicitacao: &OptionSolicitacao) -> Result<Option<Solicitacao>,BsonError> {
+        let filter = to_document(solicitacao).expect("error converting to document");
         self.model.find_one(filter).await
     }
-    pub async fn get_all(&self, solicitacao: OptionSolicitacao, options: QueryOptions) -> Result<Vec<Solicitacao>,BsonError> {
-        let filter = to_document(&solicitacao).expect("error converting to document");
+    pub async fn get_all(&self, solicitacao: &OptionSolicitacao, options: QueryOptions) -> Result<Vec<Solicitacao>,BsonError> {
+        let filter = to_document(solicitacao).expect("error converting to document");
         self.model.find(filter, options).await
     }
     pub async fn create<'a>(&self, mut solicitacao: Box<Solicitacao>) ->  Result<Option<Box<Solicitacao>>,AppError> {
@@ -38,7 +38,7 @@ impl SolicitacaoRepository {
             Some(solicitacao)
         })?)
     }
-    pub async fn update_one<'a>(&self, mut solicitacao: Box<OptionSolicitacao>, aluno_id: ObjectId, prof_id: ObjectId) ->  Result<Option<Solicitacao>,AppError> {
+    pub async fn update_one<'a>(&self, mut solicitacao: Box<OptionSolicitacao>, aluno_id: &ObjectId, prof_id: &ObjectId) ->  Result<Option<Solicitacao>,AppError> {
         solicitacao.id_aluno = None;
         solicitacao.id_professor = None;
         solicitacao.created_at = None;
@@ -58,7 +58,7 @@ impl SolicitacaoRepository {
             Err(err) => Err(AppError::from(err)),
         }
     }
-    pub async fn delete_one<'a>(&self, aluno_id: ObjectId, prof_id: ObjectId) -> Result<bool,MongoDbError> {
+    pub async fn delete_one<'a>(&self, aluno_id: &ObjectId, prof_id: &ObjectId) -> Result<bool,MongoDbError> {
         let filter = doc!{"id_aluno": aluno_id, "id_professor": prof_id};
         self.model.delete_one(filter).await
     }

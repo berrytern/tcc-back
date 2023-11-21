@@ -20,8 +20,8 @@ impl ProfessorRepository {
             model
         }
     }
-    pub async fn get_one(&self, user: OptionUser) -> Result<Option<User>,BsonError> {
-        let filter = to_document(&user).expect("error converting to document");
+    pub async fn get_one(&self, user: &OptionUser) -> Result<Option<User>,BsonError> {
+        let filter = to_document(user).expect("error converting to document");
         self.model.find_one(filter).await
     }
     pub async fn get_all(&self, mut user: OptionUser, options: QueryOptions) -> Result<Vec<User>,BsonError> {
@@ -39,7 +39,7 @@ impl ProfessorRepository {
             Some(user)
         })
     }
-    pub async fn update_one<'a>(&self, mut user: Box<OptionUser>, id: ObjectId) ->  Result<Option<User>,BsonError> {
+    pub async fn update_one<'a>(&self, mut user: Box<OptionUser>, id: &ObjectId) ->  Result<Option<User>,BsonError> {
         user.id = None;
         user.user_type = None;
         user.created_at = None;
@@ -56,7 +56,7 @@ impl ProfessorRepository {
             Err(err) => Err(err),
         }
     }
-    pub async fn delete_one<'a>(&self, id: ObjectId) -> Result<bool,MongoDbError> {
+    pub async fn delete_one<'a>(&self, id: &ObjectId) -> Result<bool,MongoDbError> {
         let filter = doc!{"_id": id, "user_type": "professor"};
         self.model.delete_one(filter).await
     }

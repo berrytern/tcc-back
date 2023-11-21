@@ -1,15 +1,15 @@
 use actix_web::HttpResponse;
 use mongodb::bson::oid::ObjectId;
-use crate::{infrastructure::{repository::gestor_repository::GestorRepository, database::schemas::user_schema::{User, OptionUser}}, errors::AppError, port::query_filter::QueryOptions};
+use crate::{infrastructure::{repository::aluno_repository::AlunoRepository, database::schemas::user_schema::{User, OptionUser}}, errors::AppError, port::query_filter::QueryOptions};
 
 #[derive(Clone)]
-pub struct GestorController{
-    repository: Box<GestorRepository>
+pub struct AlunoController{
+    repository: Box<AlunoRepository>
 }
 
-impl GestorController {
-    pub fn new(repository: Box<GestorRepository>) -> Self{
-        GestorController{
+impl AlunoController {
+    pub fn new(repository: Box<AlunoRepository>) -> Self{
+        AlunoController{
             repository
         }
     }
@@ -18,19 +18,19 @@ impl GestorController {
         Ok(self.repository.get_one(user).await
             .map(|result| HttpResponse::Ok().json(result))?)
     }
-    pub async fn get_all_gestor(&self, user: OptionUser, options: QueryOptions) -> Result<HttpResponse, AppError> {
+    pub async fn get_all_aluno(&self, user: OptionUser, options: QueryOptions) -> Result<HttpResponse, AppError> {
         Ok(self.repository.get_all(user, options).await
             .map(|result| HttpResponse::Ok().json(result))?)
     }
     
-    pub async fn create_gestor(&self, user: Box<User>) -> Result<HttpResponse, AppError> {
+    pub async fn create_aluno(&self, user: Box<User>) -> Result<HttpResponse, AppError> {
         Ok(self.repository.create(user).await
             .map(|result| {
                 if result.is_some() {HttpResponse::Created().json(&Some(result))} else {HttpResponse::Ok().body("")}
             })?)
     }
     
-    pub async fn update_gestor(&self, user: Box<OptionUser>, id: &ObjectId) -> Result<HttpResponse, AppError> {
+    pub async fn update_aluno(&self, user: Box<OptionUser>, id: &ObjectId) -> Result<HttpResponse, AppError> {
         Ok(self.repository.update_one(
             user, id
         ).await
@@ -39,7 +39,7 @@ impl GestorController {
             })?)
     }
     
-    pub async fn delete_gestor(&self, id: &ObjectId) -> Result<HttpResponse, AppError> {
+    pub async fn delete_aluno(&self, id: &ObjectId) -> Result<HttpResponse, AppError> {
         Ok(self.repository.delete_one(
             id
         ).await
