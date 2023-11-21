@@ -30,7 +30,6 @@ impl SolicitacaoRepository {
         self.model.find(filter, options).await
     }
     pub async fn create<'a>(&self, mut solicitacao: Box<Solicitacao>) ->  Result<Option<Box<Solicitacao>>,AppError> {
-        StatusType::validate(&solicitacao.status)?;
         solicitacao.status = "pending".to_string();
         solicitacao.created_at = Some(DateTime::now());
         solicitacao.updated_at = Some(DateTime::now());

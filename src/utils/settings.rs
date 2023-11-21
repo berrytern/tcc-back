@@ -1,15 +1,17 @@
-use derivative::Derivative;
 use dotenv::dotenv;
 use std::env;
 
-#[derive(Derivative)]
-#[derivative(Debug, Default)]
 pub struct Env{
-    #[derivative(Default(value = "2"))]
     pub workers: u8,
     pub mongodb_uri: String,
-    // #[derivative(Default(value = "false"))]
-    // tContinue: bool,
+}
+impl Default for Env{
+    fn default() -> Self {
+        Env{
+            workers: 2,
+            mongodb_uri: "".to_string(),
+        }
+    }
 }
 
 pub fn load_env() -> Env {

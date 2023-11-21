@@ -1,3 +1,4 @@
+mod application;
 mod di;
 mod controllers;
 mod port;

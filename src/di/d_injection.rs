@@ -3,6 +3,13 @@ use crate::controllers::{
     professor_controller::ProfessorController, solicitacao_controller::SolicitacaoController,
     turma_controller::TurmaController,
 };
+use crate::application::services::{
+    aluno_service::AlunoService,
+    gestor_service::GestorService,
+    professor_service::ProfessorService,
+    solicitacao_service::SolicitacaoService,
+    turma_service::TurmaService,
+};
 use crate::infrastructure::database::schemas::solicitacao_schema::Solicitacao;
 use crate::infrastructure::database::schemas::turma_schema::Turma;
 use crate::infrastructure::database::{
@@ -16,11 +23,6 @@ use crate::infrastructure::repository::{
 };
 use crate::utils::settings::Env;
 
-#[derive(Clone)]
-pub struct Repository {
-    pub solicitacao: SolicitacaoRepository,
-    pub turma: TurmaRepository,
-}
 #[derive(Clone)]
 pub struct Controller {
     pub aluno: AlunoController,
@@ -46,9 +48,15 @@ pub async fn build(env: &Env) -> App {
 
     let aluno = AlunoRepository::new(Box::new(user_model.clone())).await;
     let gestor = GestorRepository::new(Box::new(user_model.clone())).await;
-    let professor = ProfessorRepository::new(Box::new(user_model.clone())).await;
-    let solicitacao = SolicitacaoRepository::new(Box::new(solicitacao_model.clone())).await;
-    let turma = TurmaRepository::new(Box::new(turma_model.clone())).await;
+    let professor = ProfessorRepository::new(Box::new(user_model)).await;
+    let solicitacao = SolicitacaoRepository::new(Box::new(solicitacao_model)).await;
+    let turma = TurmaRepository::new(Box::new(turma_model)).await;
+
+    let aluno = AlunoService::new(Box::new(aluno));
+    let gestor = GestorService::new(Box::new(gestor));
+    let professor = ProfessorService::new(Box::new(professor));
+    let solicitacao = SolicitacaoService::new(Box::new(solicitacao));
+    let turma = TurmaService::new(Box::new(turma));
 
     App {
         controllers: Controller {
