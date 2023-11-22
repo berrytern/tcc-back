@@ -1,12 +1,9 @@
 use crate::application::models::login::Login;
 use crate::application::services::auth_service::AuthService;
-use crate::{
-    errors::AppError,
-    infrastructure::database::schemas::user_schema::{OptionUser, User},
-    port::query_filter::QueryOptions,
-};
+use crate::errors::AppError;
+use crate::utils::settings::Env;
 use actix_web::HttpResponse;
-use mongodb::bson::oid::ObjectId;
+
 #[derive(Clone)]
 pub struct AuthController {
     service: Box<AuthService>,
@@ -17,11 +14,11 @@ impl AuthController {
         AuthController { service }
     }
 
-    pub async fn login(&self, user: Login, secret: &str, salt: &str) -> Result<HttpResponse, AppError> {
-        Ok(self
+    pub async fn login(&self, user: Login, env: &Env) -> Result<HttpResponse, AppError> {
+        self
             .service
-            .login(user, secret, salt)
+            .login(user, env)
             .await
-            .map(|result| HttpResponse::Ok().json(result))?)
+            .map(|result| HttpResponse::Ok().json(result))
     }
 }

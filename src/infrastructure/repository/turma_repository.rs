@@ -3,15 +3,15 @@ use mongodb::{IndexModel,
     bson::{DateTime,to_document, doc, extjson::de::Error as BsonError},
     options::IndexOptions};
 use mongodb::error::Error as MongoDbError;
-use crate::infrastructure::database::{schemas::turma_schema::{Turma,OptionTurma},connection::Model};
+use crate::infrastructure::database::{schemas::turma_schema::{Turma,OptionTurma},connection::RepoModel};
 use crate::port::query_filter::QueryOptions;
 
 #[derive(Clone)]
 pub struct TurmaRepository{
-    model: Box<Model<Turma>>,
+    model: Box<RepoModel<Turma>>,
 }
 impl TurmaRepository {
-    pub async fn new(model: Box<Model<Turma>>)-> Self{
+    pub async fn new(model: Box<RepoModel<Turma>>)-> Self{
         let options = IndexOptions::builder().unique(true).build();
         let index = IndexModel::builder().keys(doc!{"id_aluno":1,"id_professor":1}).options(options).build();
         let _ = model.create_index(index, None).await;

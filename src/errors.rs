@@ -5,7 +5,6 @@ use mongodb::bson::extjson::de::Error as BsonError;
 use mongodb::bson::oid::Error as OidError;
 use mongodb::error::Error as MongoDbError;
 use mongodb::error::{WriteFailure,WriteConcernError,WriteError};
-use pwhash;
 
 #[derive(Debug)]
 pub enum AppErrorType {

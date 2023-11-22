@@ -43,6 +43,7 @@ services:
       - MONGODB_URI=mongodb://admin:admin@mongo:27017/
       - JWT_SECRET=${JWT_SECRET}
       - HASH_SALT=${HASH_SALT}
+      - HASH_COUNT=${HASH_COUNT}
     ports:
       - 8080:8080
     networks: 

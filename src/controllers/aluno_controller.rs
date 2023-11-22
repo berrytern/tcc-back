@@ -1,7 +1,7 @@
 use crate::application::services::aluno_service::AlunoService;
 use crate::{
     errors::AppError,
-    infrastructure::database::schemas::user_schema::{OptionUser, User},
+    infrastructure::database::schemas::user_schema::{OptionUserSchema, UserSchema},
     port::query_filter::QueryOptions,
 };
 use actix_web::HttpResponse;
@@ -16,54 +16,54 @@ impl AlunoController {
         AlunoController { service }
     }
 
-    pub async fn get_one(&self, user: &mut OptionUser) -> Result<HttpResponse, AppError> {
-        Ok(self
+    pub async fn get_one(&self, user: &mut OptionUserSchema) -> Result<HttpResponse, AppError> {
+        self
             .service
             .get_one(user)
             .await
-            .map(|result| HttpResponse::Ok().json(result))?)
+            .map(|result| HttpResponse::Ok().json(result))
     }
     pub async fn get_all_aluno(
         &self,
-        user: &mut OptionUser,
+        user: &mut OptionUserSchema,
         options: QueryOptions,
     ) -> Result<HttpResponse, AppError> {
-        Ok(self
+        self
             .service
             .get_all_aluno(user, options)
             .await
-            .map(|result| HttpResponse::Ok().json(result))?)
+            .map(|result| HttpResponse::Ok().json(result))
     }
 
-    pub async fn create_aluno(&self, user: Box<User>) -> Result<HttpResponse, AppError> {
-        Ok(self.service.create_aluno(user).await.map(|result| {
+    pub async fn create_aluno(&self, user: Box<UserSchema>) -> Result<HttpResponse, AppError> {
+        self.service.create_aluno(user).await.map(|result| {
             if result.is_some() {
                 HttpResponse::Created().json(&Some(result))
             } else {
                 HttpResponse::Ok().body("")
             }
-        })?)
+        })
     }
 
     pub async fn update_aluno(
         &self,
-        user: Box<OptionUser>,
+        user: Box<OptionUserSchema>,
         id: &ObjectId,
     ) -> Result<HttpResponse, AppError> {
-        Ok(self.service.update_aluno(user, id).await.map(|result| {
+        self.service.update_aluno(user, id).await.map(|result| {
             if result.is_some() {
                 HttpResponse::Ok().json(&Some(result))
             } else {
                 HttpResponse::Ok().body("")
             }
-        })?)
+        })
     }
 
     pub async fn delete_aluno(&self, id: &ObjectId) -> Result<HttpResponse, AppError> {
-        Ok(self
+        self
             .service
             .delete_aluno(id)
             .await
-            .map(|result| HttpResponse::NoContent().json(result))?)
+            .map(|result| HttpResponse::Ok().json(result))
     }
 }

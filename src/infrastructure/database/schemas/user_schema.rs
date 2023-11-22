@@ -3,11 +3,10 @@ use mongodb::bson::{DateTime,oid::ObjectId};
 
 // #[serde(rename_all = "camelCase")]
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct User {
+pub struct UserSchema {
     #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
     pub id: Option<ObjectId>,
     pub name: String,
-    #[serde(alias = "type")]
     pub user_type: String,
     pub email: String,
     pub password: String,
@@ -17,7 +16,7 @@ pub struct User {
 }
 //#[serde(rename_all = "camelCase")]
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct OptionUser {
+pub struct OptionUserSchema {
     #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
     pub id: Option<ObjectId>,
     #[serde(skip_serializing_if = "Option::is_none")]

@@ -2,7 +2,7 @@ use crate::di::d_injection::App;
 use crate::routes::handler::HANDLER;
 use crate::{
     errors::AppError,
-    infrastructure::database::schemas::user_schema::{OptionUser, User},
+    infrastructure::database::schemas::user_schema::{OptionUserSchema, UserSchema},
     port::query_filter::QueryFilter,
 };
 use actix_web::{
@@ -14,7 +14,7 @@ use mongodb::bson::oid::ObjectId;
 // pf:r
 pub async fn get_professor(
     app: Data<App>,
-    query: Query<OptionUser>,
+    query: Query<OptionUserSchema>,
     id: Path<String>,
 ) -> Result<impl Responder, AppError> {
     let controller = &app.controllers.professor;
@@ -28,7 +28,7 @@ pub async fn get_professor(
 // pf:r
 pub async fn get_all_professor(
     app: Data<App>,
-    query: Query<OptionUser>,
+    query: Query<OptionUserSchema>,
     options: Query<QueryFilter>,
 ) -> Result<impl Responder, AppError> {
     let controller = &app.controllers.professor;
@@ -43,7 +43,7 @@ pub async fn get_all_professor(
 // pf:c
 pub async fn create_professor(
     app: Data<App>,
-    user: Json<User>,
+    user: Json<UserSchema>,
 ) -> Result<impl Responder, AppError> {
     let controller = &app.controllers.professor;
     controller
@@ -54,7 +54,7 @@ pub async fn create_professor(
 // pf:u
 pub async fn update_professor(
     app: Data<App>,
-    user: Json<OptionUser>,
+    user: Json<OptionUserSchema>,
     id: Path<String>,
 ) -> Result<impl Responder, AppError> {
     let controller = &app.controllers.professor;

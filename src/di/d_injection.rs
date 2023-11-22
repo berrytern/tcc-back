@@ -14,8 +14,8 @@ use crate::infrastructure::database::schemas::auth_schema::Auth;
 use crate::infrastructure::database::schemas::solicitacao_schema::Solicitacao;
 use crate::infrastructure::database::schemas::turma_schema::Turma;
 use crate::infrastructure::database::{
-    connection::{get_connection, Model},
-    schemas::user_schema::User,
+    connection::{get_connection, RepoModel},
+    schemas::user_schema::UserSchema,
 };
 use crate::infrastructure::repository::auth_repository::AuthRepository;
 use crate::infrastructure::repository::solicitacao_repository::SolicitacaoRepository;
@@ -47,10 +47,10 @@ pub async fn build(env: &Env) -> App {
         .await
         .expect("Cannot connect to MongoDb");
     let db = client.database("teste");
-    let user_model = Model::<User>::new(&db, "users").await;
-    let auth_model = Model::<Auth>::new(&db, "auth").await;
-    let solicitacao_model = Model::<Solicitacao>::new(&db, "solicitacoes").await;
-    let turma_model = Model::<Turma>::new(&db, "turmas").await;
+    let user_model = RepoModel::<UserSchema>::new(&db, "users").await;
+    let auth_model = RepoModel::<Auth>::new(&db, "auth").await;
+    let solicitacao_model = RepoModel::<Solicitacao>::new(&db, "solicitacoes").await;
+    let turma_model = RepoModel::<Turma>::new(&db, "turmas").await;
 
     let user = UserRepository::new(Box::new(user_model.clone())).await;
     let aluno = AlunoRepository::new(Box::new(user_model.clone())).await;

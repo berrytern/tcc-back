@@ -2,7 +2,7 @@ use crate::di::d_injection::App;
 use crate::routes::handler::HANDLER;
 use crate::{
     errors::AppError,
-    infrastructure::database::schemas::user_schema::{OptionUser, User},
+    infrastructure::database::schemas::user_schema::{OptionUserSchema, UserSchema},
     port::query_filter::QueryFilter,
 };
 use actix_web::{
@@ -14,7 +14,7 @@ use mongodb::bson::oid::ObjectId;
 // al:r
 pub async fn get_aluno(
     app: Data<App>,
-    query: Query<OptionUser>,
+    query: Query<OptionUserSchema>,
     id: Path<String>,
 ) -> Result<impl Responder, AppError> {
     let controller = &app.controllers.aluno;
@@ -28,7 +28,7 @@ pub async fn get_aluno(
 // al:r
 pub async fn get_all_aluno(
     app: Data<App>,
-    query: Query<OptionUser>,
+    query: Query<OptionUserSchema>,
     options: Query<QueryFilter>,
 ) -> Result<impl Responder, AppError> {
     let controller = &app.controllers.aluno;
@@ -40,7 +40,7 @@ pub async fn get_all_aluno(
         .map_err(|err| HANDLER(Box::new(err)))
 }
 // al:c
-pub async fn create_aluno(app: Data<App>, user: Json<User>) -> Result<impl Responder, AppError> {
+pub async fn create_aluno(app: Data<App>, user: Json<UserSchema>) -> Result<impl Responder, AppError> {
     let controller = &app.controllers.aluno;
     controller
         .create_aluno(Box::new(user.into_inner()))
@@ -50,7 +50,7 @@ pub async fn create_aluno(app: Data<App>, user: Json<User>) -> Result<impl Respo
 // al:u
 pub async fn update_aluno(
     app: Data<App>,
-    user: Json<OptionUser>,
+    user: Json<OptionUserSchema>,
     id: Path<String>,
 ) -> Result<impl Responder, AppError> {
     let controller = &app.controllers.aluno;

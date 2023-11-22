@@ -9,10 +9,10 @@ use actix_web::{
 
 pub async fn login(app: Data<App>, query: Json<Login>) -> Result<impl Responder, AppError> {
     let controller = &app.controllers.auth;
-    let secret = &app.env;
+    let env = &app.env;
     let login = query.into_inner();
     controller
-        .login(login, &secret.jwt_secret, &secret.hash_salt)
+        .login(login, env)
         .await
         .map_err(|err| HANDLER(Box::new(err)))
 }

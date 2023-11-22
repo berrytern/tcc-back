@@ -21,15 +21,15 @@ impl SolicitacaoService {
     }
     
     pub async fn create_solicitacao(&self, mut solicitacao: Box<Solicitacao>) -> Result<Option<Box<Solicitacao>>, AppError> {
-        CreateSolicitacaoValidation::validate(&mut(*solicitacao))?;
-        Ok(self.repository.create(solicitacao).await?)
+        CreateSolicitacaoValidation::validate(&mut(solicitacao))?;
+        self.repository.create(solicitacao).await
     }
     
     pub async fn update_solicitacao(&self, mut solicitacao: Box<OptionSolicitacao>, aluno_id: &ObjectId, prof_id: &ObjectId) -> Result<Option<Solicitacao>, AppError> {
-        UpdateSolicitacaoValidation::validate(&mut(*solicitacao))?;
-        Ok(self.repository.update_one(
+        UpdateSolicitacaoValidation::validate(&mut(solicitacao))?;
+        self.repository.update_one(
             solicitacao, aluno_id, prof_id
-        ).await?)
+        ).await
     }
     
     pub async fn delete_solicitacao(&self, aluno_id: &ObjectId, prof_id: &ObjectId) -> Result<bool, AppError> {

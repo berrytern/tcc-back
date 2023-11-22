@@ -21,12 +21,12 @@ impl TurmaService {
     }
     
     pub async fn create_turma(&self, mut turma: Box<Turma>) -> Result<Option<Box<Turma>>, AppError> {
-        CreateTurmaValidation::validate(&mut(*turma))?;
+        CreateTurmaValidation::validate(&mut(turma))?;
         Ok(self.repository.create(turma).await?)
     }
     
     pub async fn update_turma(&self, mut turma: Box<OptionTurma>,  aluno_id: &ObjectId, prof_id: &ObjectId) -> Result<Option<Turma>, AppError> {
-        UpdateTurmaValidation::validate(&mut(*turma))?;
+        UpdateTurmaValidation::validate(&mut(turma))?;
         Ok(self.repository.update_one(
             turma, aluno_id, prof_id
         ).await?)

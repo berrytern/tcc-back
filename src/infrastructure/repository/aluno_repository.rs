@@ -3,15 +3,15 @@ use mongodb::{IndexModel,
     bson::{to_document, doc, extjson::de::Error as BsonError},
     options::IndexOptions};
 use mongodb::error::Error as MongoDbError;
-use crate::infrastructure::database::{schemas::user_schema::{User,OptionUser},connection::Model};
+use crate::infrastructure::database::{schemas::user_schema::{UserSchema,OptionUserSchema},connection::RepoModel};
 use crate::port::query_filter::QueryOptions;
 
 #[derive(Clone)]
 pub struct AlunoRepository{
-    model: Box<Model<User>>,
+    model: Box<RepoModel<UserSchema>>,
 }
 impl AlunoRepository {
-    pub async fn new(model: Box<Model<User>>)-> Self{
+    pub async fn new(model: Box<RepoModel<UserSchema>>)-> Self{
         let options = IndexOptions::builder().unique(true).build();
         let index = IndexModel::builder().keys(doc!{"email":1}).options(options).build();
         let _ = model.create_index(index, None).await;
@@ -19,23 +19,23 @@ impl AlunoRepository {
             model
         }
     }
-    pub async fn get_one(&self, user: &mut OptionUser) -> Result<Option<User>,BsonError> {
+    pub async fn get_one(&self, user: &mut OptionUserSchema) -> Result<Option<UserSchema>,BsonError> {
         user.user_type = Some("aluno".to_string());
         let filter = to_document(user).expect("error converting to document");
         self.model.find_one(filter).await
     }
-    pub async fn get_all(&self, user: &mut OptionUser, options: QueryOptions) -> Result<Vec<User>,BsonError> {
+    pub async fn get_all(&self, user: &mut OptionUserSchema, options: QueryOptions) -> Result<Vec<UserSchema>,BsonError> {
         user.user_type = Some("aluno".to_string());
         let filter = to_document(&user).expect("error converting to document");
         self.model.find(filter, options).await
     }
-    pub async fn create<'a>(&self, mut user: Box<User>) ->  Result<Option<Box<User>>,MongoDbError> {
+    pub async fn create<'a>(&self, mut user: Box<UserSchema>) ->  Result<Option<Box<UserSchema>>,MongoDbError> {
         self.model.create(&user).await.map(|op| {
             user.id = op;
             Some(user)
         })
     }
-    pub async fn update_one<'a>(&self, user: Box<OptionUser>, id: &ObjectId) ->  Result<Option<User>,BsonError> {
+    pub async fn update_one<'a>(&self, user: Box<OptionUserSchema>, id: &ObjectId) ->  Result<Option<UserSchema>,BsonError> {
         let filter = doc!{"_id":id};
         match self.model.update_one(user, filter, None).await {
             Ok(up) => {

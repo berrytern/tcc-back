@@ -5,15 +5,15 @@ use mongodb::{IndexModel,
 use mongodb::error::Error as MongoDbError;
 use crate::errors::AppError;
 use crate::infrastructure::database::schemas::solicitacao_schema::StatusType;
-use crate::infrastructure::database::{schemas::solicitacao_schema::{Solicitacao,OptionSolicitacao},connection::Model};
+use crate::infrastructure::database::{schemas::solicitacao_schema::{Solicitacao,OptionSolicitacao},connection::RepoModel};
 use crate::port::query_filter::QueryOptions;
 
 #[derive(Clone)]
 pub struct SolicitacaoRepository{
-    model: Box<Model<Solicitacao>>,
+    model: Box<RepoModel<Solicitacao>>,
 }
 impl SolicitacaoRepository {
-    pub async fn new(model: Box<Model<Solicitacao>>)-> Self{
+    pub async fn new(model: Box<RepoModel<Solicitacao>>)-> Self{
         let options = IndexOptions::builder().unique(true).build();
         let index = IndexModel::builder().keys(doc!{"id_aluno":1,"id_professor":1}).options(options).build();
         let _ = model.create_index(index, None).await;
@@ -43,7 +43,7 @@ impl SolicitacaoRepository {
         solicitacao.created_at = None;
         solicitacao.updated_at = Some(DateTime::now());
         if let Some(status) = &solicitacao.status{
-            StatusType::validate(&status)?;
+            StatusType::validate(status)?;
         }
         let filter = doc!{"aluno_id":aluno_id,"professor_id":prof_id};
         match self.model.update_one(solicitacao, filter, None).await {

@@ -18,13 +18,13 @@ pub async fn get_connection(uri: &str) -> Result<Client, mongodb::error::Error> 
     Client::with_options(client_options)
 }
 #[derive(Clone)]
-pub struct Model<T>{
+pub struct RepoModel<T>{
     collection: Box<mongodb::Collection<T>>,
 }
 
-impl<T> Model<T>  {
+impl<T> RepoModel<T>  {
     pub async fn new(db: &mongodb::Database, collection_name: &str) ->  Self {
-        Model::<T>{
+        RepoModel::<T>{
             collection: Box::new(db.collection::<T>(collection_name))
         }
     }
@@ -78,7 +78,7 @@ impl<T> Model<T>  {
     }
 
 }
-impl<T> Model<T>{
+impl<T> RepoModel<T>{
     pub async fn update_one<G>(&self, data: G, filter: Document, options: Option<UpdateOptions>) -> Result<UpdateResult, BsonError> 
     where
     G: Serialize + std::convert::From<G>,

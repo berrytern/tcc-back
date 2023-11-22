@@ -7,6 +7,7 @@ pub struct Env{
     pub mongodb_uri: String,
     pub jwt_secret: String,
     pub hash_salt: String,
+    pub hash_cost: u32,
 }
 impl Default for Env{
     fn default() -> Self {
@@ -15,6 +16,7 @@ impl Default for Env{
             mongodb_uri: "".to_string(),
             jwt_secret: "".to_string(),
             hash_salt: "".to_string(),
+            hash_cost: 13,
         }
     }
 }
@@ -38,6 +40,10 @@ pub fn load_env() -> Env {
         hash_salt: match env::var("HASH_SALT"){
             Ok(var) => var,
             Err(_error) => panic!("Environment variable 'HASH_SALT' not setted")
-        }
+        },
+        hash_cost: match env::var("HASH_COST"){
+            Ok(var) => var.parse::<u32>().unwrap(),
+            Err(_error) => default.hash_cost,
+        },
     }
 }
