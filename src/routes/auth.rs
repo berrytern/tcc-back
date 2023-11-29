@@ -1,6 +1,5 @@
 use crate::application::models::login::Login;
 use crate::di::d_injection::App;
-use crate::routes::handler::HANDLER;
 use crate::errors::AppError;
 use actix_web::{
     web::{Data, Json},
@@ -14,5 +13,4 @@ pub async fn login(app: Data<App>, query: Json<Login>) -> Result<impl Responder,
     controller
         .login(login, env)
         .await
-        .map_err(|err| HANDLER(Box::new(err)))
 }

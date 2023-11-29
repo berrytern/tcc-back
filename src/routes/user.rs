@@ -22,5 +22,4 @@ pub async fn login(
     controller
         .get_one(&user)
         .await
-        .map_err(|err| HANDLER(Box::new(err)))
 }

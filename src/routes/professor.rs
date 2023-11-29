@@ -1,5 +1,4 @@
 use crate::di::d_injection::App;
-use crate::routes::handler::HANDLER;
 use crate::{
     errors::AppError,
     infrastructure::database::schemas::user_schema::{OptionUserSchema, UserSchema},
@@ -23,7 +22,6 @@ pub async fn get_professor(
     controller
         .get_one(&mut (user))
         .await
-        .map_err(|err| HANDLER(Box::new(err)))
 }
 // pf:r
 pub async fn get_all_professor(
@@ -37,7 +35,6 @@ pub async fn get_all_professor(
     controller
         .get_all_professor(&mut (user), options.into())
         .await
-        .map_err(|err| HANDLER(Box::new(err)))
 }
 
 // pf:c
@@ -49,7 +46,6 @@ pub async fn create_professor(
     controller
         .create_professor(Box::new(user.into_inner()))
         .await
-        .map_err(|err| HANDLER(Box::new(err)))
 }
 // pf:u
 pub async fn update_professor(
@@ -62,7 +58,6 @@ pub async fn update_professor(
     controller
         .update_professor(Box::new(user.into_inner()), &id)
         .await
-        .map_err(|err| HANDLER(Box::new(err)))
 }
 // pf:d
 pub async fn delete_professor(
@@ -74,5 +69,4 @@ pub async fn delete_professor(
     controller
         .delete_professor(&id)
         .await
-        .map_err(|err| HANDLER(Box::new(err)))
 }

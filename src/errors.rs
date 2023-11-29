@@ -1,6 +1,6 @@
 use actix_web::{error::ResponseError, http::StatusCode, HttpResponse};
 use serde::Serialize;
-use std::fmt;
+use std::fmt::{self, Display};
 use mongodb::bson::extjson::de::Error as BsonError;
 use mongodb::bson::oid::Error as OidError;
 use mongodb::error::Error as MongoDbError;
@@ -16,28 +16,25 @@ pub enum AppErrorType {
 #[derive(Debug)]
 pub struct AppError {
     pub message: Option<String>,
-    pub cause: Option<String>,
+    pub description: Option<String>,
     pub error_type: AppErrorType,
 }
-impl std::error::Error for AppError {
-    
+impl Display for AppError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, r"\{{ {:?}, {:?})\}}", self.message, self.description)
+    }
 }
 impl AppError {
-    pub fn new(cause: Option<String>, message: Option<String>, error_type: AppErrorType) -> AppError {
+    pub fn new(description: Option<String>, message: Option<String>, error_type: AppErrorType) -> AppError {
         AppError {
-            cause,
+            description,
             message,
             error_type,
         }
     }
-    pub fn message(&self) -> String {
+    pub fn get_message(&self) -> String {
         match self {
             AppError {
-                message: Some(message),
-                ..
-            } => message.clone(),
-            AppError {
-                message: None,
                 error_type: AppErrorType::ValidationError,
                 ..
             } => "The body content is invalid".to_string(),
@@ -49,11 +46,13 @@ impl AppError {
         }
     }
 }
+
 impl From<Box<dyn std::error::Error>> for AppError {
     fn from(error: Box<dyn std::error::Error>) -> AppError {
+        println!("{:?}", error);
         AppError {
             message: None, 
-            cause: Some(error.to_string()),
+            description: Some(error.to_string()),
             error_type: AppErrorType::ValidationError
         }
     }
@@ -62,7 +61,7 @@ impl From<pwhash::error::Error> for AppError {
     fn from(error: pwhash::error::Error) -> Self {
         AppError {
             message: None, 
-            cause: Some(error.to_string()),
+            description: Some(error.to_string()),
             error_type: AppErrorType::ValidationError
         }
     }
@@ -71,7 +70,7 @@ impl From<jsonwebtoken::errors::Error> for AppError {
     fn from(error: jsonwebtoken::errors::Error) -> AppError {
         AppError {
             message: None, 
-            cause: Some(error.to_string()),
+            description: Some(error.to_string()),
             error_type: AppErrorType::ValidationError
         }
     }
@@ -80,7 +79,7 @@ impl From<BsonError> for AppError {
     fn from(error: BsonError) -> AppError {
         AppError {
             message: None, 
-            cause: Some(error.to_string()),
+            description: Some(error.to_string()),
             error_type: AppErrorType::ValidationError
         }
     }
@@ -89,7 +88,7 @@ impl From<WriteFailure> for AppError {
     fn from(_error: WriteFailure) -> AppError {
         AppError {
             message: None, 
-            cause: None,
+            description: None,
             error_type: AppErrorType::ConflictError
         }
     }
@@ -98,7 +97,7 @@ impl From<WriteConcernError> for AppError {
     fn from(_error: WriteConcernError) -> AppError {
         AppError {
             message: None, 
-            cause: None,
+            description: None,
             error_type: AppErrorType::ConflictError
         }
     }
@@ -107,7 +106,7 @@ impl From<WriteError> for AppError {
     fn from(_error: WriteError) -> AppError {
         AppError {
             message: None, 
-            cause: None,
+            description: None,
             error_type: AppErrorType::ConflictError
         }
     }
@@ -116,7 +115,7 @@ impl From<OidError> for AppError {
     fn from(error: OidError) -> AppError {
         AppError {
             message: None, 
-            cause: Some(error.to_string()),
+            description: Some(error.to_string()),
             error_type: AppErrorType::ValidationError
         }
     }
@@ -125,23 +124,18 @@ impl From<MongoDbError> for AppError {
     fn from(error: MongoDbError) -> AppError {
         AppError {
             message: None, 
-            cause: Some(error.to_string()),
+            description: Some(error.to_string()),
             error_type: AppErrorType::ValidationError,
         }
     }
 }
 
-impl fmt::Display for AppError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
-        write!(f, "{:?}", self)
-    }
-}
-
 #[derive(Serialize)]
 pub struct AppErrorResponse {
-    pub error: String,
+    pub cause: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub message: Option<String>,
+    pub description: String
 }
 
 impl ResponseError for AppError {
@@ -153,15 +147,17 @@ impl ResponseError for AppError {
         }
     }
     fn error_response(&self) -> HttpResponse {
-        if let Some(message) = &self.cause {
+        if let Some(description) = self.description.clone() {
             HttpResponse::build(self.status_code()).json(AppErrorResponse {
-                error: self.message(),
-                message: Some(message.to_string())
+                cause: self.get_message(),
+                message: self.message.clone(),
+                description: description,
             })
         } else {
             HttpResponse::build(self.status_code()).json(AppErrorResponse {
-                error: self.message(),
-                message: None
+                cause: self.get_message(),
+                message: None,
+                description: "".to_string(),
             })
         }
     }

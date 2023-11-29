@@ -10,8 +10,8 @@ impl StatusType {
             "pending" => Ok("pending"),
             "accepted" => Ok("accepted"),
             _ => Err(AppError{
-                cause: None,
-                message: Some(format!("invalid status value:{}; must be one of [pending,accepted]", value)),
+                message: Some("invalid status field".to_string()),
+                description: Some(format!("invalid status field: the value '{}' must be one of [pending,accepted]", value)),
                 error_type: AppErrorType::ValidationError
             })
         }
