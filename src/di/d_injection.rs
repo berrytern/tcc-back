@@ -11,7 +11,7 @@ use crate::controllers::{
     turma_controller::TurmaController,
 };
 use crate::infrastructure::database::schemas::auth_schema::Auth;
-use crate::infrastructure::database::schemas::solicitacao_schema::Solicitacao;
+use crate::infrastructure::database::schemas::solicitacao_schema::SolicitacaoSchema;
 use crate::infrastructure::database::schemas::turma_schema::Turma;
 use crate::infrastructure::database::{
     connection::{get_connection, RepoModel},
@@ -49,7 +49,7 @@ pub async fn build(env: &Env) -> App {
     let db = client.database("teste");
     let user_model = RepoModel::<UserSchema>::new(&db, "users").await;
     let auth_model = RepoModel::<Auth>::new(&db, "auth").await;
-    let solicitacao_model = RepoModel::<Solicitacao>::new(&db, "solicitacoes").await;
+    let solicitacao_model = RepoModel::<SolicitacaoSchema>::new(&db, "solicitacoes").await;
     let turma_model = RepoModel::<Turma>::new(&db, "turmas").await;
 
     let user = UserRepository::new(Box::new(user_model.clone())).await;

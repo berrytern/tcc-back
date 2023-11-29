@@ -5,7 +5,7 @@ use mongodb::bson::{DateTime,oid::ObjectId};
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Turma {
     pub id_aluno: ObjectId,
-    pub id_professor: ObjectId, 
+    pub id_professor: ObjectId,
     pub active: bool,
     pub created_at: Option<DateTime>,
     pub updated_at: Option<DateTime>,

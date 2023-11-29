@@ -11,9 +11,6 @@ pub struct AuthRepository{
 }
 impl AuthRepository {
     pub async fn new(model: Box<RepoModel<Auth>>)-> Self{
-        let options = IndexOptions::builder().unique(true).build();
-        let index = IndexModel::builder().keys(doc!{"email":1}).options(options).build();
-        let _ = model.create_index(index, None).await;
         AuthRepository {
             model
         }

@@ -20,7 +20,7 @@ impl StatusType {
 
 // #[serde(rename_all = "camelCase")]
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct Solicitacao {
+pub struct SolicitacaoSchema {
     pub id_aluno: ObjectId,
     pub id_professor: ObjectId, 
     pub status: String,
@@ -31,7 +31,7 @@ pub struct Solicitacao {
 }
 //#[serde(rename_all = "camelCase")]
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct OptionSolicitacao {
+pub struct OptionSolicitacaoSchema {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id_aluno: Option<ObjectId>,
     #[serde(skip_serializing_if = "Option::is_none")]

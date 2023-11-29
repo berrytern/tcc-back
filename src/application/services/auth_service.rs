@@ -36,6 +36,7 @@ impl AuthService {
                 if let Some(id) = user.id {
                     let json_token = JsonToken {
                         sub: id.to_string(),
+                        sub_type: user.user_type.to_string(),
                         company: "uepb".to_string(),
                         scope: match user.user_type.as_str() {
                             "aluno" => UserScope::ALUNO.to_string(),

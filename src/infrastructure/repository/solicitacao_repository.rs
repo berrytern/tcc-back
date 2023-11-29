@@ -5,15 +5,15 @@ use mongodb::{IndexModel,
 use mongodb::error::Error as MongoDbError;
 use crate::errors::AppError;
 use crate::infrastructure::database::schemas::solicitacao_schema::StatusType;
-use crate::infrastructure::database::{schemas::solicitacao_schema::{Solicitacao,OptionSolicitacao},connection::RepoModel};
+use crate::infrastructure::database::{schemas::solicitacao_schema::{SolicitacaoSchema,OptionSolicitacaoSchema},connection::RepoModel};
 use crate::port::query_filter::QueryOptions;
 
 #[derive(Clone)]
 pub struct SolicitacaoRepository{
-    model: Box<RepoModel<Solicitacao>>,
+    model: Box<RepoModel<SolicitacaoSchema>>,
 }
 impl SolicitacaoRepository {
-    pub async fn new(model: Box<RepoModel<Solicitacao>>)-> Self{
+    pub async fn new(model: Box<RepoModel<SolicitacaoSchema>>)-> Self{
         let options = IndexOptions::builder().unique(true).build();
         let index = IndexModel::builder().keys(doc!{"id_aluno":1,"id_professor":1}).options(options).build();
         let _ = model.create_index(index, None).await;
@@ -21,15 +21,15 @@ impl SolicitacaoRepository {
             model
         }
     }
-    pub async fn get_one(&self, solicitacao: &OptionSolicitacao) -> Result<Option<Solicitacao>,BsonError> {
+    pub async fn get_one(&self, solicitacao: &OptionSolicitacaoSchema) -> Result<Option<SolicitacaoSchema>,BsonError> {
         let filter = to_document(solicitacao).expect("error converting to document");
         self.model.find_one(filter).await
     }
-    pub async fn get_all(&self, solicitacao: &OptionSolicitacao, options: QueryOptions) -> Result<Vec<Solicitacao>,BsonError> {
+    pub async fn get_all(&self, solicitacao: &OptionSolicitacaoSchema, options: QueryOptions) -> Result<Vec<SolicitacaoSchema>,BsonError> {
         let filter = to_document(solicitacao).expect("error converting to document");
         self.model.find(filter, options).await
     }
-    pub async fn create<'a>(&self, mut solicitacao: Box<Solicitacao>) ->  Result<Option<Box<Solicitacao>>,AppError> {
+    pub async fn create<'a>(&self, mut solicitacao: Box<SolicitacaoSchema>) ->  Result<Option<Box<SolicitacaoSchema>>,AppError> {
         solicitacao.status = "pending".to_string();
         solicitacao.created_at = Some(DateTime::now());
         solicitacao.updated_at = Some(DateTime::now());
@@ -37,7 +37,7 @@ impl SolicitacaoRepository {
             Some(solicitacao)
         })?)
     }
-    pub async fn update_one<'a>(&self, mut solicitacao: Box<OptionSolicitacao>, aluno_id: &ObjectId, prof_id: &ObjectId) ->  Result<Option<Solicitacao>,AppError> {
+    pub async fn update_one<'a>(&self, mut solicitacao: Box<OptionSolicitacaoSchema>, aluno_id: &ObjectId, prof_id: &ObjectId) ->  Result<Option<SolicitacaoSchema>,AppError> {
         solicitacao.id_aluno = None;
         solicitacao.id_professor = None;
         solicitacao.created_at = None;
