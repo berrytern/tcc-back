@@ -4,7 +4,6 @@ use mongodb::{IndexModel,
     options::IndexOptions};
 use mongodb::error::Error as MongoDbError;
 use crate::errors::AppError;
-use crate::infrastructure::database::schemas::solicitacao_schema::StatusType;
 use crate::infrastructure::database::{schemas::solicitacao_schema::{SolicitacaoSchema,OptionSolicitacaoSchema},connection::RepoModel};
 use crate::port::query_filter::QueryOptions;
 
@@ -38,13 +37,6 @@ impl SolicitacaoRepository {
         })?)
     }
     pub async fn update_one<'a>(&self, mut solicitacao: Box<OptionSolicitacaoSchema>, aluno_id: &ObjectId, prof_id: &ObjectId) ->  Result<Option<SolicitacaoSchema>,AppError> {
-        solicitacao.id_aluno = None;
-        solicitacao.id_professor = None;
-        solicitacao.created_at = None;
-        solicitacao.updated_at = Some(DateTime::now());
-        if let Some(status) = &solicitacao.status{
-            StatusType::validate(status)?;
-        }
         let filter = doc!{"aluno_id":aluno_id,"professor_id":prof_id};
         match self.model.update_one(solicitacao, filter, None).await {
             Ok(up) => {

@@ -25,10 +25,10 @@ impl Display for AppError {
     }
 }
 impl AppError {
-    pub fn new(description: Option<String>, message: Option<String>, error_type: AppErrorType) -> AppError {
+    pub fn new(message: Option<String>, description: Option<String>, error_type: AppErrorType) -> AppError {
         AppError {
-            description,
             message,
+            description,
             error_type,
         }
     }

@@ -1,12 +1,12 @@
 use mongodb::bson::DateTime;
-
+use crate::application::validation::status_type_validator::StatusType;
 use crate::{errors::AppError, infrastructure::database::schemas::solicitacao_schema::SolicitacaoSchema};
 
 pub struct CreateSolicitacaoValidation{}
 
 impl CreateSolicitacaoValidation{
     pub fn validate(solicitacao: &mut SolicitacaoSchema) -> Result<(),AppError> {
-        solicitacao.status = "pending".to_string();
+        StatusType::validate(&solicitacao.status)?;
         solicitacao.created_at = Some(DateTime::now());
         solicitacao.updated_at = Some(DateTime::now());
         Ok(())

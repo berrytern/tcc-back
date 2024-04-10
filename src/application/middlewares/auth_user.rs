@@ -4,7 +4,7 @@ use actix_web::{error::ErrorUnauthorized, Error, FromRequest};
 use futures::Future;
 
 use jsonwebtoken::{encode, decode, Header, Algorithm, Validation, EncodingKey, DecodingKey};
-use serde::{de::DeserializeOwned, Deserialize, Serialize};
+use serde::{Deserialize, Serialize};
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AuthUser {
     aud: String,         // Optional. Audience

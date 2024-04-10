@@ -23,6 +23,7 @@ impl SolicitacaoService {
     }
     
     pub async fn create_solicitacao(&self, mut solicitacao: Box<SolicitacaoSchema>) -> Result<Option<Solicitacao>, AppError> {
+        solicitacao.status = "pending".to_string();
         CreateSolicitacaoValidation::validate(&mut(solicitacao))?;
         Ok(self.repository.create(solicitacao).await
             .map(|opt_sol| opt_sol.map(|sol| Solicitacao::from(*sol)))?)

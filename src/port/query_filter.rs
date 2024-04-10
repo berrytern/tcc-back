@@ -5,18 +5,21 @@ use serde::{Deserialize,Serialize};
 pub struct QueryFilter {
     pub limit: Option<u16>,
     pub sort: Option<String>,
+    pub page: Option<usize>
 }
 impl From<QueryFilter> for QueryOptions {
     fn from(val: QueryFilter) -> Self {
-        if let (Some(limit),Some(sort)) = (val.limit.or(Some(10)),val.sort.or(Some("-created".to_string()))){
+        if let (Some(limit),Some(sort), Some(page)) = (val.limit.or(Some(10)),val.sort.or(Some("-created".to_string())),val.page.or(Some(1))){
             QueryOptions{
                 limit,
                 sort,
+                page,
             }
         } else {
             QueryOptions{
                 limit: 10,
                 sort: "created_at".to_string(),
+                page: 1,
             }
         }
     }
@@ -24,6 +27,7 @@ impl From<QueryFilter> for QueryOptions {
 pub struct QueryOptions {
     pub limit: u16,
     pub sort: String,
+    pub page: usize,
 }
 
 impl From<QueryOptions> for FindOptions {

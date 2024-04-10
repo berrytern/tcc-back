@@ -1,6 +1,6 @@
-use mongodb::{IndexModel,
+use mongodb::{
     bson::{to_document, doc, extjson::de::Error as BsonError, oid::ObjectId},
-    options::{IndexOptions, UpdateOptions}};
+    options::UpdateOptions};
 use mongodb::error::Error as MongoDbError;
 use crate::infrastructure::database::{schemas::auth_schema::Auth,connection::RepoModel};
 use crate::port::query_filter::QueryOptions;
