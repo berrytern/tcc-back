@@ -37,10 +37,9 @@ impl AlunoService {
             
     }
 
-    pub async fn create_aluno(&self, mut user: Box<UserInput>) -> Result<Option<UserOutput>, AppError> {
-        let mut user = CreateUserValidation::validate(&mut (user))?;
+    pub async fn create_aluno(&self, mut user: UserInput) -> Result<Option<UserOutput>, AppError> {
+        let mut user = CreateUserValidation::validate(&mut (user), "aluno")?;
         user.password = bcrypt::hash(user.password)?;
-        user.user_type = "aluno".to_string();
         Ok(self.repository.create(user).await
             .map(|opt_user| opt_user.map(|user| UserOutput::from(user)))?)
     }

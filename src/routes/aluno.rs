@@ -41,7 +41,7 @@ pub async fn get_all_aluno(
 pub async fn create_aluno(app: Data<App>, user: Json<UserInput>) -> Result<impl Responder, AppError> {
     let controller = &app.controllers.aluno;
     controller
-        .create_aluno(Box::new(user.into_inner()))
+        .create_aluno(user.into_inner())
         .await
 }
 // al:u

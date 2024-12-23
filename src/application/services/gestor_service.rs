@@ -27,9 +27,8 @@ impl GestorService {
     }
     
     pub async fn create_gestor(&self, mut user: UserInput) -> Result<Option<UserOutput>, AppError> {
-        let mut user = CreateUserValidation::validate(&mut(user))?;
+        let mut user = CreateUserValidation::validate(&mut(user), "gestor")?;
         user.password = bcrypt::hash(user.password)?;
-        user.user_type = "gestor".to_string();
         user.matricula = None;
         Ok(self.repository.create(user).await
             .map(|opt_user| opt_user.map(|user| UserOutput::from(user)))?)

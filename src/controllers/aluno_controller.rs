@@ -36,7 +36,7 @@ impl AlunoController {
             .map(|result| HttpResponse::Ok().json(result))
     }
 
-    pub async fn create_aluno(&self, user: Box<UserInput>) -> Result<HttpResponse, AppError> {
+    pub async fn create_aluno(&self, user: UserInput) -> Result<HttpResponse, AppError> {
         self.service.create_aluno(user).await.map(|result| {
             if result.is_some() {
                 HttpResponse::Created().json(&Some(result))

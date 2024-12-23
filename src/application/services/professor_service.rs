@@ -27,9 +27,8 @@ impl ProfessorService {
     }
     
     pub async fn create_professor(&self, mut user: UserInput) -> Result<Option<UserOutput>, AppError> {
-        let mut user = CreateUserValidation::validate(&mut(user))?;
+        let mut user = CreateUserValidation::validate(&mut(user), "professor")?;
         user.password = bcrypt::hash(user.password)?;
-        user.user_type = "professor".to_string();
         Ok(self.repository.create(user).await
             .map(|opt_user| opt_user.map(|user| UserOutput::from(user)))?)
     }

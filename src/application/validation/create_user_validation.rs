@@ -5,8 +5,8 @@ use crate::{application::models::user::UserInput, errors::AppError, infrastructu
 pub struct CreateUserValidation{}
 
 impl CreateUserValidation{
-    pub fn validate(user: &mut UserInput) -> Result<UserSchema,AppError> {
-        let schema: UserSchema = user.into_schema(DateTime::now(), DateTime::now());
+    pub fn validate(user: &mut UserInput, user_type: &str) -> Result<UserSchema,AppError> {
+        let schema: UserSchema = user.into_schema(user_type, DateTime::now(), DateTime::now());
         Ok(schema)
     }
 }
