@@ -1,6 +1,6 @@
 use actix_web::{web::{Json,Data,Path,Query}, Responder};
 use mongodb::bson::oid::ObjectId;
-use crate::{infrastructure::database::schemas::user_schema::{OptionUserSchema, UserSchema}, errors::AppError, port::query_filter::QueryFilter};
+use crate::{application::models::user::UserInput, errors::AppError, infrastructure::database::schemas::user_schema::{OptionUserSchema, UserSchema}, port::query_filter::QueryFilter};
 use crate::di::d_injection::App;
 
 // gs:r
@@ -18,9 +18,9 @@ pub async fn get_all_gestor(app: Data<App>, query: Query<OptionUserSchema>, opti
     controller.get_all_gestor(&mut(user), options.into()).await
 }
 // gs:c
-pub async fn create_gestor(app: Data<App>, user: Json<UserSchema>) -> Result<impl Responder, AppError> {
+pub async fn create_gestor(app: Data<App>, user: Json<UserInput>) -> Result<impl Responder, AppError> {
     let controller = &app.controllers.gestor;
-    controller.create_gestor(Box::new(user.into_inner())).await
+    controller.create_gestor(user.into_inner()).await
 }
 // gs:u
 pub async fn update_gestor(app: Data<App>, user: Json<OptionUserSchema>, id: Path<String>) -> Result<impl Responder, AppError> {

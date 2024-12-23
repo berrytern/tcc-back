@@ -11,8 +11,8 @@ pub struct UserSchema {
     pub email: String,
     pub password: String,
     pub matricula: Option<String>,
-    pub created_at: Option<DateTime>,
-    pub updated_at: Option<DateTime>,
+    pub created_at: DateTime,
+    pub updated_at: DateTime,
 }
 //#[serde(rename_all = "camelCase")]
 #[derive(Serialize, Deserialize, Debug, Clone)]

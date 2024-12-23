@@ -1,7 +1,8 @@
+use crate::application::models::user::UserInput;
 use crate::di::d_injection::App;
 use crate::{
     errors::AppError,
-    infrastructure::database::schemas::user_schema::{OptionUserSchema, UserSchema},
+    infrastructure::database::schemas::user_schema::OptionUserSchema,
     port::query_filter::QueryFilter,
 };
 use actix_web::{
@@ -37,7 +38,7 @@ pub async fn get_all_aluno(
         .await
 }
 // al:c
-pub async fn create_aluno(app: Data<App>, user: Json<UserSchema>) -> Result<impl Responder, AppError> {
+pub async fn create_aluno(app: Data<App>, user: Json<UserInput>) -> Result<impl Responder, AppError> {
     let controller = &app.controllers.aluno;
     controller
         .create_aluno(Box::new(user.into_inner()))

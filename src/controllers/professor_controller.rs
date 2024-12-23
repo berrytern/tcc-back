@@ -1,3 +1,4 @@
+use crate::application::models::user::UserInput;
 use crate::application::services::professor_service::ProfessorService;
 use crate::{
     errors::AppError,
@@ -35,7 +36,7 @@ impl ProfessorController {
             .map(|result| HttpResponse::Ok().json(result))
     }
 
-    pub async fn create_professor(&self, user: Box<UserSchema>) -> Result<HttpResponse, AppError> {
+    pub async fn create_professor(&self, user: UserInput) -> Result<HttpResponse, AppError> {
         self.service.create_professor(user).await.map(|result| {
             if result.is_some() {
                 HttpResponse::Created().json(&Some(result))

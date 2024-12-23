@@ -29,7 +29,7 @@ impl GestorRepository {
         let filter = to_document(&user).expect("error converting to document");
         self.model.find(filter, options).await
     }
-    pub async fn create<'a>(&self, mut user: Box<UserSchema>) ->  Result<Option<Box<UserSchema>>,MongoDbError> {
+    pub async fn create<'a>(&self, mut user: UserSchema) ->  Result<Option<UserSchema>,MongoDbError> {
         self.model.create(&user).await.map(|op| {
             user.id = op;
             Some(user)

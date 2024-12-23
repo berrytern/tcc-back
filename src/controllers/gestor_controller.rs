@@ -1,7 +1,8 @@
+use crate::application::models::user::UserInput;
 use crate::application::services::gestor_service::GestorService;
 use crate::{
     errors::AppError,
-    infrastructure::database::schemas::user_schema::{OptionUserSchema, UserSchema},
+    infrastructure::database::schemas::user_schema::OptionUserSchema,
     port::query_filter::QueryOptions,
 };
 use actix_web::HttpResponse;
@@ -35,7 +36,7 @@ impl GestorController {
             .map(|result| HttpResponse::Ok().json(result))
     }
 
-    pub async fn create_gestor(&self, user: Box<UserSchema>) -> Result<HttpResponse, AppError> {
+    pub async fn create_gestor(&self, user: UserInput) -> Result<HttpResponse, AppError> {
         self.service.create_gestor(user).await.map(|result| {
             if result.is_some() {
                 HttpResponse::Created().json(&Some(result))

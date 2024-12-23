@@ -1,3 +1,4 @@
+use crate::application::models::user::UserInput;
 use crate::di::d_injection::App;
 use crate::{
     errors::AppError,
@@ -40,11 +41,11 @@ pub async fn get_all_professor(
 // pf:c
 pub async fn create_professor(
     app: Data<App>,
-    user: Json<UserSchema>,
+    user: Json<UserInput>,
 ) -> Result<impl Responder, AppError> {
     let controller = &app.controllers.professor;
     controller
-        .create_professor(Box::new(user.into_inner()))
+        .create_professor(user.into_inner())
         .await
 }
 // pf:u

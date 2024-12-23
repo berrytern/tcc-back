@@ -1,10 +1,36 @@
+use mongodb::bson::DateTime;
 use serde::{Serialize, Deserialize};
 use crate::utils::functions::format_date;
-use crate::infrastructure::database::schemas::user_schema::{UserSchema,OptionUserSchema};
+use crate::infrastructure::database::schemas::user_schema::UserSchema;
 
 #[derive(Serialize,Deserialize,Clone)]
-pub struct User {
+pub struct UserInput {
+    pub name: String,
+    pub user_type: String,
+    pub email: String,
+    pub password: String,
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub matricula: Option<String>,
+}
+
+
+impl UserInput {
+    pub fn into_schema(&self, created_at: DateTime, updated_at: DateTime) -> UserSchema {
+        UserSchema {
+            id: None,
+            name: self.name.to_owned(),
+            password: self.password.to_owned(),
+            user_type: self.user_type.to_owned(),
+            email: self.email.to_owned(),
+            matricula: self.matricula.to_owned(),
+            created_at: created_at,
+            updated_at: updated_at,
+        }
+    }
+}
+
+#[derive(Serialize,Deserialize,Clone)]
+pub struct UserOutput {
     pub id: Option<String>,
     pub name: String,
     #[serde(alias = "type")]
@@ -15,8 +41,7 @@ pub struct User {
     pub created_at: String,
     pub updated_at: String,
 }
-
-impl From<UserSchema> for User {
+impl From<UserSchema> for UserOutput {
     fn from(value: UserSchema) -> Self {
         Self {
             id: value.id.map(|id| id.to_string()),
@@ -24,21 +49,8 @@ impl From<UserSchema> for User {
             user_type: value.user_type,
             email: value.email,
             matricula: value.matricula,
-            created_at: if let Some(created_at) = value.created_at {format_date(created_at.to_string())} else {"".to_string()},
-            updated_at: if let Some(updated_at) = value.updated_at {format_date(updated_at.to_string())} else {"".to_string()},
-        }
-    }
-}
-impl From<OptionUserSchema> for User {
-    fn from(value: OptionUserSchema) -> Self {
-        Self {
-            id: value.id.map(|id| id.to_string()),
-            name: if let Some(name) = value.name {name} else {"".to_string()},
-            user_type: if let Some(user_type) = value.user_type {user_type} else {"".to_string()},
-            email: if let Some(email) = value.email {email} else {"".to_string()},
-            matricula: value.matricula,
-            created_at: if let Some(created_at) = value.created_at {created_at.to_string()} else {"".to_string()},
-            updated_at: if let Some(updated_at) = value.updated_at {updated_at.to_string()} else {"".to_string()},
+            created_at: format_date(value.created_at.to_string()),
+            updated_at: format_date(value.updated_at.to_string()),
         }
     }
 }

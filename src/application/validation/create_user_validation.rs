@@ -1,14 +1,12 @@
 use mongodb::bson::DateTime;
 
-use crate::{errors::AppError, infrastructure::database::schemas::user_schema::UserSchema};
+use crate::{application::models::user::UserInput, errors::AppError, infrastructure::database::schemas::user_schema::UserSchema};
 
 pub struct CreateUserValidation{}
 
 impl CreateUserValidation{
-    pub fn validate(user: &mut UserSchema) -> Result<(),AppError> {
-        user.id = None;
-        user.created_at = Some(DateTime::now());
-        user.updated_at = Some(DateTime::now());
-        Ok(())
+    pub fn validate(user: &mut UserInput) -> Result<UserSchema,AppError> {
+        let schema: UserSchema = user.into_schema(DateTime::now(), DateTime::now());
+        Ok(schema)
     }
 }

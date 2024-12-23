@@ -11,7 +11,7 @@ use crate::{
 };
 use crate::application::utils::user_scopes::UserScope;
 use crate::utils::default::MAX_EXP;
-use jsonwebtoken::{decode, encode, get_current_timestamp, Algorithm, DecodingKey, EncodingKey, Header, Validation};
+use jsonwebtoken::{encode, get_current_timestamp, EncodingKey, Header};
 use mongodb::bson::DateTime;
 use pwhash::bcrypt::{self, BcryptSetup};
 
