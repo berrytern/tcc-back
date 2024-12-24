@@ -4,6 +4,7 @@ use std::env;
 #[derive(Clone)]
 pub struct Env{
     pub workers: u8,
+    pub port: u16,
     pub mongodb_uri: String,
     pub rabbitmq_uri: String,
     pub jwt_secret: String,
@@ -14,6 +15,7 @@ impl Default for Env{
     fn default() -> Self {
         Env{
             workers: 2,
+            port: 8080,
             mongodb_uri: "".to_string(),
             rabbitmq_uri: "".to_string(),
             jwt_secret: "".to_string(),
@@ -30,6 +32,10 @@ pub fn load_env() -> Env {
         workers: match env::var("WORKERS"){
             Ok(var) => var.parse::<u8>().unwrap(),
             Err(_error) => default.workers,
+        },
+        port: match env::var("PORT"){
+            Ok(var) => var.parse::<u16>().unwrap(),
+            Err(_error) => default.port,
         },
         mongodb_uri: match env::var("MONGODB_URI"){
             Ok(var) => var,

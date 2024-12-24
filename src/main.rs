@@ -67,7 +67,7 @@ async fn main() -> std::io::Result<()> {
             .route("/v1/solicitacoes/{aluno_id}/{professor_id}", patch().to(update_solicitacao))
             .route("/v1/solicitacoes/{aluno_id}/{professor_id}", delete().to(delete_solicitacao))
     })
-    .bind(("0.0.0.0", 8080))?
+    .bind(("0.0.0.0", env.port))?
     .workers(env.workers.into()).run()
     .await
 }
