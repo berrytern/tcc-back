@@ -3,6 +3,7 @@ use std::borrow::BorrowMut;
 use amqp_client_rust::api::eventbus::AsyncEventbusRabbitMQ;
 use amqp_client_rust::domain::config::{Config, ConfigOptions};
 
+use crate::application::models::user::UserOutput;
 use crate::application::services::auth_service::AuthService;
 use crate::application::services::{
     aluno_service::AlunoService, gestor_service::GestorService,
@@ -83,14 +84,16 @@ pub async fn build(env: &Env) -> App {
         let aluno_repository = aluno.clone();
         async move {
             let mut query: (OptionUserSchema, QueryOptions) = serde_json::from_slice(&body)?;
-            let result = aluno_repository.get_all(query.0.borrow_mut(), query.1).await?;
+            let result = aluno_repository.get_all(query.0.borrow_mut(), query.1).await
+                .map( |item| item.into_iter().map(|f| UserOutput::from(f)).collect::<Vec<UserOutput>>())?;
+
             return Ok(serde_json::to_vec(&result)?)
         }
     };
 
     // Register rpc provider binded with alunos.find
     eventbus.rpc_server(get_alunos, "alunos.find", "application/json", None).await;
-    
+
     let aluno = AlunoService::new(Box::new(aluno_repository));
     let auth = AuthService::new(Box::new(auth), Box::new(user));
     let gestor = GestorService::new(Box::new(gestor));
