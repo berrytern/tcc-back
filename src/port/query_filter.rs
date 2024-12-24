@@ -24,6 +24,8 @@ impl From<QueryFilter> for QueryOptions {
         }
     }
 }
+
+#[derive(Serialize, Deserialize, Debug)]
 pub struct QueryOptions {
     pub limit: u16,
     pub sort: String,

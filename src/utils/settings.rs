@@ -5,6 +5,7 @@ use std::env;
 pub struct Env{
     pub workers: u8,
     pub mongodb_uri: String,
+    pub rabbitmq_uri: String,
     pub jwt_secret: String,
     pub hash_salt: String,
     pub hash_cost: u32,
@@ -14,6 +15,7 @@ impl Default for Env{
         Env{
             workers: 2,
             mongodb_uri: "".to_string(),
+            rabbitmq_uri: "".to_string(),
             jwt_secret: "".to_string(),
             hash_salt: "".to_string(),
             hash_cost: 13,
@@ -31,7 +33,11 @@ pub fn load_env() -> Env {
         },
         mongodb_uri: match env::var("MONGODB_URI"){
             Ok(var) => var,
-            Err(_error) => panic!("Environment variable 'WORKERS' not setted")
+            Err(_error) => panic!("Environment variable 'MONGODB_URI' not setted")
+        },
+        rabbitmq_uri: match env::var("RABBITMQ_URI"){
+            Ok(var) => var,
+            Err(_error) => panic!("Environment variable 'RABBITMQ_URI' not setted")
         },
         jwt_secret: match env::var("JWT_SECRET"){
             Ok(var) => var,

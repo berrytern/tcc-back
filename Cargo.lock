@@ -234,6 +234,44 @@ dependencies = [
 ]
 
 [[package]]
+name = "amqp-client-rust"
+version = "0.0.3-alpha.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f7fdaf77c961137cb029ef1866cbfd9ac814df9c62da3d84b89906d74c591ec3"
+dependencies = [
+ "amqprs",
+ "async-trait",
+ "tokio",
+ "url",
+ "uuid",
+]
+
+[[package]]
+name = "amqp_serde"
+version = "0.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "787581044ca08ad61cdb3a4e21afba087fb8cdba3bb3e23ce69a7d091808014d"
+dependencies = [
+ "bytes",
+ "serde",
+ "serde_bytes_ng",
+]
+
+[[package]]
+name = "amqprs"
+version = "1.8.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3f1b4afcbd862e16c272b7625b6b057930b052d63c720bc90f6afab0d9abe8a8"
+dependencies = [
+ "amqp_serde",
+ "async-trait",
+ "bytes",
+ "serde",
+ "serde_bytes_ng",
+ "tokio",
+]
+
+[[package]]
 name = "android-tzdata"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1604,6 +1642,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "serde_bytes_ng"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bdb0ebce8684e2253f964e8b6ce51f0ccc6666bbb448fb4a6788088bda6544b6"
+dependencies = [
+ "serde",
+]
+
+[[package]]
 name = "serde_derive"
 version = "1.0.192"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1843,6 +1890,7 @@ name = "tcc-back"
 version = "0.1.0"
 dependencies = [
  "actix-web",
+ "amqp-client-rust",
  "async-trait",
  "dotenv",
  "futures",

@@ -1,3 +1,8 @@
+use std::borrow::BorrowMut;
+
+use amqp_client_rust::api::eventbus::AsyncEventbusRabbitMQ;
+use amqp_client_rust::domain::config::{Config, ConfigOptions};
+
 use crate::application::services::auth_service::AuthService;
 use crate::application::services::{
     aluno_service::AlunoService, gestor_service::GestorService,
@@ -13,6 +18,7 @@ use crate::controllers::{
 use crate::infrastructure::database::schemas::auth_schema::Auth;
 use crate::infrastructure::database::schemas::solicitacao_schema::SolicitacaoSchema;
 use crate::infrastructure::database::schemas::turma_schema::Turma;
+use crate::infrastructure::database::schemas::user_schema::OptionUserSchema;
 use crate::infrastructure::database::{
     connection::{get_connection, RepoModel},
     schemas::user_schema::UserSchema,
@@ -24,6 +30,7 @@ use crate::infrastructure::repository::{
     aluno_repository::AlunoRepository, gestor_repository::GestorRepository,
     professor_repository::ProfessorRepository, turma_repository::TurmaRepository,
 };
+use crate::port::query_filter::QueryOptions;
 use crate::utils::settings::Env;
 
 #[derive(Clone)]
@@ -43,6 +50,17 @@ pub struct App {
 }
 
 pub async fn build(env: &Env) -> App {
+    let config = Config::from_url(
+        &env.rabbitmq_uri,
+        ConfigOptions {
+            queue_name: "tcc".to_string(),
+            rpc_queue_name: "rpc_tcc".to_string(),
+            rpc_exchange_name: "rpc_tcc".to_string(),
+        },
+    ).expect("Cannot setup rabbitmq config");
+    let eventbus = AsyncEventbusRabbitMQ::new(
+        config
+    ).await;
     let client = get_connection(&env.mongodb_uri)
         .await
         .expect("Cannot connect to MongoDb");
@@ -60,7 +78,20 @@ pub async fn build(env: &Env) -> App {
     let solicitacao = SolicitacaoRepository::new(Box::new(solicitacao_model)).await;
     let turma = TurmaRepository::new(Box::new(turma_model)).await;
 
-    let aluno = AlunoService::new(Box::new(aluno));
+    let aluno_repository = aluno.clone();
+    let get_alunos = move |body:Vec<u8>| {
+        let aluno_repository = aluno.clone();
+        async move {
+            let mut query: (OptionUserSchema, QueryOptions) = serde_json::from_slice(&body)?;
+            let result = aluno_repository.get_all(query.0.borrow_mut(), query.1).await?;
+            return Ok(serde_json::to_vec(&result)?)
+        }
+    };
+
+    // Register rpc provider binded with alunos.find
+    eventbus.rpc_server(get_alunos, "alunos.find", "application/json", None).await;
+    
+    let aluno = AlunoService::new(Box::new(aluno_repository));
     let auth = AuthService::new(Box::new(auth), Box::new(user));
     let gestor = GestorService::new(Box::new(gestor));
     let professor = ProfessorService::new(Box::new(professor));
