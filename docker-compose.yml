@@ -44,6 +44,7 @@ services:
       - JWT_SECRET=${JWT_SECRET}
       - HASH_SALT=${HASH_SALT}
       - HASH_COUNT=${HASH_COUNT}
+      - RABBITMQ_URI=amqp://guest:guest@rabbitmq:5672/
     ports:
       - 8080:8080
     networks: 
