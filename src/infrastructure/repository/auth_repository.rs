@@ -26,7 +26,7 @@ impl AuthRepository {
     pub async fn create<'a>(&self, mut auth: Box<Auth>) ->  Result<Option<Box<Auth>>,MongoDbError> {
         self.model.create(&auth).await.map(|op| {
             if let Some(id) = op {
-                auth.id = id;
+                auth.id = *id;
             }
             Some(auth)
         })

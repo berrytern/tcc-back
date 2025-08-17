@@ -10,7 +10,7 @@ use futures::stream::TryStreamExt;
 
 use serde::{Serialize, de::DeserializeOwned};
 
-use crate::port::query_filter::QueryOptions;
+use crate::{infrastructure::database::schemas::user_schema::MyObjectId, port::query_filter::QueryOptions};
 
 pub async fn get_connection(uri: &str) -> Result<Client, mongodb::error::Error> {
     let mut client_options = ClientOptions::parse(uri).await?;
@@ -59,14 +59,14 @@ impl<T> RepoModel<T>  {
         Ok(result)
     }
 
-    pub async fn create(&self, data: &T) -> Result<Option<ObjectId>, MongoDbError> 
+    pub async fn create(&self, data: &T) -> Result<Option<MyObjectId>, MongoDbError> 
     where
     T: Serialize,
     {
         self.collection.insert_one(
             data, None
         ).await
-            .map(|op| Some(op.inserted_id.as_object_id().unwrap()))
+            .map(|op| Some(op.inserted_id.as_object_id().unwrap().into()))
     }
 
     pub async fn delete_one(&self, filter: Document) -> Result<bool, MongoDbError>

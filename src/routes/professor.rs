@@ -1,10 +1,11 @@
-use crate::application::models::user::UserInput;
+use crate::application::models::user::{UserInput, UserOutput};
 use crate::di::d_injection::App;
 use crate::{
     errors::AppError,
     infrastructure::database::schemas::user_schema::{OptionUserSchema, UserSchema},
     port::query_filter::QueryFilter,
 };
+use actix_web::{delete, get, patch, post};
 use actix_web::{
     web::{Data, Json, Path, Query},
     Responder,
@@ -12,6 +13,8 @@ use actix_web::{
 use mongodb::bson::oid::ObjectId;
 
 // pf:r
+#[utoipa::path(responses((status = OK, body = UserOutput)))]
+#[get("/v1/professores/{id}")]
 pub async fn get_professor(
     app: Data<App>,
     query: Query<OptionUserSchema>,
@@ -19,12 +22,14 @@ pub async fn get_professor(
 ) -> Result<impl Responder, AppError> {
     let controller = &app.controllers.professor;
     let mut user = query.into_inner();
-    user.id = Some(ObjectId::parse_str(id.into_inner())?);
+    user.id = Some(ObjectId::parse_str(id.into_inner())?.into());
     controller
         .get_one(&mut (user))
         .await
 }
 // pf:r
+#[utoipa::path(responses((status = OK, body = Vec<UserOutput>)))]
+#[get("/v1/professores")]
 pub async fn get_all_professor(
     app: Data<App>,
     query: Query<OptionUserSchema>,
@@ -39,6 +44,8 @@ pub async fn get_all_professor(
 }
 
 // pf:c
+#[utoipa::path(responses((status = OK, body = UserOutput)))]
+#[post("/v1/professores")]
 pub async fn create_professor(
     app: Data<App>,
     user: Json<UserInput>,
@@ -49,6 +56,8 @@ pub async fn create_professor(
         .await
 }
 // pf:u
+#[utoipa::path(responses((status = OK, body = UserOutput)))]
+#[patch("/v1/professores/{id}")]
 pub async fn update_professor(
     app: Data<App>,
     user: Json<OptionUserSchema>,
@@ -61,6 +70,8 @@ pub async fn update_professor(
         .await
 }
 // pf:d
+#[utoipa::path(responses((status = OK, body = bool)))]
+#[delete("/v1/professores/{id}")]
 pub async fn delete_professor(
     app: Data<App>,
     id: Path<String>,

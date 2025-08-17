@@ -51,7 +51,7 @@ impl AuthService {
                         salt:None, cost: Some(env.hash_cost),variant:None},
                     access_token)?;
                     let auth = Box::new(Auth {
-                        id,
+                        id: *id,
                         user_type: user.user_type,
                         last_login: DateTime::now(),
                         refresh_token: refresh_token.to_string(),

@@ -1,9 +1,10 @@
 use mongodb::bson::DateTime;
 use serde::{Serialize, Deserialize};
+use utoipa::ToSchema;
 use crate::utils::functions::format_date;
-use crate::infrastructure::database::schemas::user_schema::UserSchema;
+use crate::infrastructure::database::schemas::user_schema::{MyDateTime, UserSchema};
 
-#[derive(Serialize,Deserialize,Clone)]
+#[derive(Serialize,Deserialize,Clone,ToSchema)]
 pub struct UserInput {
     pub name: String,
     pub email: String,
@@ -14,7 +15,7 @@ pub struct UserInput {
 
 
 impl UserInput {
-    pub fn into_schema(&self, user_type: &str, created_at: DateTime, updated_at: DateTime) -> UserSchema {
+    pub fn into_schema(&self, user_type: &str, created_at: MyDateTime, updated_at: MyDateTime) -> UserSchema {
         UserSchema {
             id: None,
             name: self.name.to_owned(),
@@ -28,7 +29,7 @@ impl UserInput {
     }
 }
 
-#[derive(Serialize,Deserialize,Clone)]
+#[derive(Serialize,Deserialize,Clone,ToSchema)]
 pub struct UserOutput {
     pub id: Option<String>,
     pub name: String,

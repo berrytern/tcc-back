@@ -1,24 +1,78 @@
+use std::ops::Deref;
+
 use serde::{Deserialize, Serialize};
 use mongodb::bson::{DateTime,oid::ObjectId};
+use utoipa::{PartialSchema, ToSchema};
 
 // #[serde(rename_all = "camelCase")]
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, ToSchema)]
 pub struct UserSchema {
     #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
-    pub id: Option<ObjectId>,
+    pub id: Option<MyObjectId>,
     pub name: String,
     pub user_type: String,
     pub email: String,
     pub password: String,
     pub matricula: Option<String>,
-    pub created_at: DateTime,
-    pub updated_at: DateTime,
+    pub created_at: MyDateTime,
+    pub updated_at: MyDateTime,
 }
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+// This attribute tells utoipa how to generate the schema for MyObjectId.
+#[schema(
+    // It should be represented as a simple String type in OpenAPI.
+    value_type = String, 
+    // Add a description for better documentation.
+    description = "A 24-character hexadecimal MongoDB Object ID",
+    // Provide a realistic example.
+    example = "507f191e810c19729de860ea"
+)]
+pub struct MyObjectId(pub ObjectId);
+
+impl Deref for MyObjectId {
+    type Target = ObjectId;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+// Implement From so you can easily convert an ObjectId into your MyObjectId.
+impl From<ObjectId> for MyObjectId {
+    fn from(id: ObjectId) -> Self {
+        MyObjectId(id)
+    }
+}
+#[derive(Serialize, Deserialize, Debug, Clone, ToSchema)]
+#[schema(
+    // It should be represented as a simple String type in OpenAPI.
+    value_type = String,
+    // Add a description for better documentation.
+    description = "A BSON DateTime",
+    // Provide a realistic example.
+    example = "2021-01-01T00:00:00Z"
+)]
+pub struct MyDateTime(pub DateTime);
+
+
+impl Deref for MyDateTime {
+    type Target = DateTime;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl From<DateTime> for MyDateTime {
+    fn from(dt: DateTime) -> Self {
+        MyDateTime(dt)
+    }
+}
+
 //#[serde(rename_all = "camelCase")]
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, ToSchema)]
 pub struct OptionUserSchema {
     #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
-    pub id: Option<ObjectId>,
+    pub id: Option<MyObjectId>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -28,7 +82,7 @@ pub struct OptionUserSchema {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub matricula: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub created_at: Option<DateTime>,
+    pub created_at: Option<MyDateTime>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub updated_at: Option<DateTime>,
+    pub updated_at: Option<MyDateTime>,
 }

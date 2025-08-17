@@ -1,6 +1,8 @@
 use serde::{Serialize, Deserialize};
 use crate::infrastructure::database::schemas::user_schema::OptionUserSchema;
+
 #[derive(Serialize,Deserialize,Clone)]
+#[derive(utoipa::ToSchema)]
 pub struct Login{
     pub login: String,
     pub password: String,

@@ -9,7 +9,7 @@ impl UpdateUserValidation{
         user.id = None;
         user.user_type = None;
         user.created_at = None;
-        user.updated_at = Some(DateTime::now());
+        user.updated_at = Some(DateTime::now().into());
         Ok(())
     }
 }
