@@ -36,7 +36,7 @@ impl SolicitacaoRepository {
             Some(solicitacao)
         })?)
     }
-    pub async fn update_one<'a>(&self, mut solicitacao: Box<OptionSolicitacaoSchema>, aluno_id: &ObjectId, prof_id: &ObjectId) ->  Result<Option<SolicitacaoSchema>,AppError> {
+    pub async fn update_one<'a>(&self, solicitacao: Box<OptionSolicitacaoSchema>, aluno_id: &ObjectId, prof_id: &ObjectId) ->  Result<Option<SolicitacaoSchema>,AppError> {
         let filter = doc!{"aluno_id":aluno_id,"professor_id":prof_id};
         match self.model.update_one(solicitacao, filter, None).await {
             Ok(up) => {

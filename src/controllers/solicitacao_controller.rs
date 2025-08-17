@@ -27,7 +27,7 @@ impl SolicitacaoController {
     pub async fn create_solicitacao(&self, solicitacao: Box<SolicitacaoSchema>) -> Result<HttpResponse, AppError> {
         self.service.create_solicitacao(solicitacao).await
             .map(|result| {
-                if result.is_some() {HttpResponse::Created().json(&Some(result))} else {HttpResponse::Ok().body("")}
+                if result.is_some() {HttpResponse::Created().json(Some(result))} else {HttpResponse::Ok().body("")}
             })
     }
     
@@ -36,7 +36,7 @@ impl SolicitacaoController {
             solicitacao, aluno_id, prof_id
         ).await
             .map(|result| {
-                if result.is_some() {HttpResponse::Ok().json(&Some(result))} else {HttpResponse::Ok().body("")}
+                if result.is_some() {HttpResponse::Ok().json(Some(result))} else {HttpResponse::Ok().body("")}
             })
     }
     

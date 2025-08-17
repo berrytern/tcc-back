@@ -2,7 +2,7 @@ use std::ops::Deref;
 
 use serde::{Deserialize, Serialize};
 use mongodb::bson::{DateTime,oid::ObjectId};
-use utoipa::{PartialSchema, ToSchema};
+use utoipa::ToSchema;
 
 // #[serde(rename_all = "camelCase")]
 #[derive(Serialize, Deserialize, Debug, Clone, ToSchema)]

@@ -27,7 +27,7 @@ impl TurmaController {
     pub async fn create_turma(&self, turma: Box<Turma>) -> Result<HttpResponse, AppError> {
         self.service.create_turma(turma).await
             .map(|result| {
-                if result.is_some() {HttpResponse::Created().json(&Some(result))} else {HttpResponse::Ok().body("")}
+                if result.is_some() {HttpResponse::Created().json(Some(result))} else {HttpResponse::Ok().body("")}
             })
     }
     
@@ -36,7 +36,7 @@ impl TurmaController {
             turma, aluno_id, prof_id
         ).await
             .map(|result| {
-                if result.is_some() {HttpResponse::Ok().json(&Some(result))} else {HttpResponse::Ok().body("")}
+                if result.is_some() {HttpResponse::Ok().json(Some(result))} else {HttpResponse::Ok().body("")}
             })
     }
     

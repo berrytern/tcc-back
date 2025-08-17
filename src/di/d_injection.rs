@@ -85,9 +85,9 @@ pub async fn build(env: &Env) -> App {
         async move {
             let mut query: (OptionUserSchema, QueryOptions) = serde_json::from_slice(&body)?;
             let result = aluno_repository.get_all(query.0.borrow_mut(), query.1).await
-                .map( |item| item.into_iter().map(|f| UserOutput::from(f)).collect::<Vec<UserOutput>>())?;
+                .map( |item| item.into_iter().map(UserOutput::from).collect::<Vec<UserOutput>>())?;
 
-            return Ok(serde_json::to_vec(&result)?)
+            Ok(serde_json::to_vec(&result)?)
         }
     };
 

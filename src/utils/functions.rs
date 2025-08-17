@@ -3,7 +3,7 @@ pub fn format_date(mut value: String) -> String {
     if value.len() == 32 {
         let mut a = String::from("");
         a.push_str(&value[0..11]);
-        a.push_str("0");
+        a.push('0');
         a.push_str(&value[11..23]);
         value = a;
     }

@@ -39,7 +39,7 @@ impl GestorController {
     pub async fn create_gestor(&self, user: UserInput) -> Result<HttpResponse, AppError> {
         self.service.create_gestor(user).await.map(|result| {
             if result.is_some() {
-                HttpResponse::Created().json(&Some(result))
+                HttpResponse::Created().json(Some(result))
             } else {
                 HttpResponse::Ok().body("")
             }
@@ -53,7 +53,7 @@ impl GestorController {
     ) -> Result<HttpResponse, AppError> {
         self.service.update_gestor(user, id).await.map(|result| {
             if result.is_some() {
-                HttpResponse::Ok().json(&Some(result))
+                HttpResponse::Ok().json(Some(result))
             } else {
                 HttpResponse::Ok().body("")
             }

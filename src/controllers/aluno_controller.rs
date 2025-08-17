@@ -39,7 +39,7 @@ impl AlunoController {
     pub async fn create_aluno(&self, user: UserInput) -> Result<HttpResponse, AppError> {
         self.service.create_aluno(user).await.map(|result| {
             if result.is_some() {
-                HttpResponse::Created().json(&Some(result))
+                HttpResponse::Created().json(Some(result))
             } else {
                 HttpResponse::Ok().body("")
             }
@@ -53,7 +53,7 @@ impl AlunoController {
     ) -> Result<HttpResponse, AppError> {
         self.service.update_aluno(user, id).await.map(|result| {
             if result.is_some() {
-                HttpResponse::Ok().json(&Some(result))
+                HttpResponse::Ok().json(Some(result))
             } else {
                 HttpResponse::Ok().body("")
             }

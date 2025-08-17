@@ -47,7 +47,7 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(move || {
         println!("running");
-        let mut app =App::new()
+        let app =App::new()
             .app_data(Data::new(app.clone()));
         let (app, api) = app
             .into_utoipa_app()

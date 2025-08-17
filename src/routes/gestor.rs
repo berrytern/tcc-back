@@ -1,6 +1,6 @@
 use actix_web::{delete, get, patch, post, web::{Data, Json, Path, Query}, Responder};
 use mongodb::bson::oid::ObjectId;
-use crate::{application::models::user::{UserInput, UserOutput}, errors::AppError, infrastructure::database::schemas::user_schema::{OptionUserSchema, UserSchema}, port::query_filter::QueryFilter};
+use crate::{application::models::user::{UserInput, UserOutput}, errors::AppError, infrastructure::database::schemas::user_schema::OptionUserSchema, port::query_filter::QueryFilter};
 use crate::di::d_injection::App;
 
 // gs:r

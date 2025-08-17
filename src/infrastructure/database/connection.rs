@@ -1,5 +1,5 @@
 use mongodb::{
-    bson::{doc, extjson::de::Error as BsonError, oid::ObjectId, to_bson, Document},
+    bson::{doc, extjson::de::Error as BsonError, to_bson, Document},
     results::{UpdateResult, CreateIndexResult},
     options::{FindOptions, UpdateOptions},
     Client, options::{ClientOptions, CreateIndexOptions}, IndexModel,

@@ -1,4 +1,3 @@
-use mongodb::bson::DateTime;
 use serde::{Serialize, Deserialize};
 use utoipa::ToSchema;
 use crate::utils::functions::format_date;
@@ -23,8 +22,8 @@ impl UserInput {
             user_type: user_type.to_owned(),
             email: self.email.to_owned(),
             matricula: self.matricula.to_owned(),
-            created_at: created_at,
-            updated_at: updated_at,
+            created_at,
+            updated_at,
         }
     }
 }

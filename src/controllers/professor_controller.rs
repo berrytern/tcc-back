@@ -2,7 +2,7 @@ use crate::application::models::user::UserInput;
 use crate::application::services::professor_service::ProfessorService;
 use crate::{
     errors::AppError,
-    infrastructure::database::schemas::user_schema::{OptionUserSchema, UserSchema},
+    infrastructure::database::schemas::user_schema::OptionUserSchema,
     port::query_filter::QueryOptions,
 };
 use actix_web::HttpResponse;
@@ -39,7 +39,7 @@ impl ProfessorController {
     pub async fn create_professor(&self, user: UserInput) -> Result<HttpResponse, AppError> {
         self.service.create_professor(user).await.map(|result| {
             if result.is_some() {
-                HttpResponse::Created().json(&Some(result))
+                HttpResponse::Created().json(Some(result))
             } else {
                 HttpResponse::Ok().body("")
             }
@@ -57,7 +57,7 @@ impl ProfessorController {
             .await
             .map(|result| {
                 if result.is_some() {
-                    HttpResponse::Ok().json(&Some(result))
+                    HttpResponse::Ok().json(Some(result))
                 } else {
                     HttpResponse::Ok().body("")
                 }

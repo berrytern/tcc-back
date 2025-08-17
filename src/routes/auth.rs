@@ -2,7 +2,7 @@ use crate::application::models::{access_token::AccessToken, login::Login};
 use crate::di::d_injection::App as DI_APP;
 use crate::errors::AppError;
 use actix_web::{
-    post, App,
+    post,
     web::{Data, Json},
     Responder,
 };

@@ -49,7 +49,7 @@ impl AppError {
 
 impl From<Box<dyn std::error::Error>> for AppError {
     fn from(error: Box<dyn std::error::Error>) -> AppError {
-        println!("{:?}", error);
+        println!("{error:?}");
         AppError {
             message: None, 
             description: Some(error.to_string()),
@@ -151,7 +151,7 @@ impl ResponseError for AppError {
             HttpResponse::build(self.status_code()).json(AppErrorResponse {
                 cause: self.get_message(),
                 message: self.message.clone(),
-                description: description,
+                description,
             })
         } else {
             HttpResponse::build(self.status_code()).json(AppErrorResponse {

@@ -2,7 +2,7 @@ use crate::application::models::user::{UserInput, UserOutput};
 use crate::di::d_injection::App;
 use crate::{
     errors::AppError,
-    infrastructure::database::schemas::user_schema::{OptionUserSchema, UserSchema},
+    infrastructure::database::schemas::user_schema::OptionUserSchema,
     port::query_filter::QueryFilter,
 };
 use actix_web::{delete, get, patch, post};
