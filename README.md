@@ -7,5 +7,6 @@ docker compose up -d
 
 - [X] Add swagger documentation
 - [ ] Add private endpoints with auth_middleware
+- [ ] Add rpc server
 - [ ] Add caching with Redis
 - [ ] Add log monitoring with datadog agent
