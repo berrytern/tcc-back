@@ -1,6 +1,7 @@
+use crate::application::models::aluno::{AlunoUpdateModel};
 use crate::application::models::user::{UserInput, UserOutput};
 use crate::application::validation::{
-    create_user_validation::CreateUserValidation, update_user_validation::UpdateUserValidation,
+    create_user::CreateUserValidation, update_aluno::UpdateAlunoValidation,
 };
 use crate::{
     errors::AppError,
@@ -46,11 +47,11 @@ impl AlunoService {
 
     pub async fn update_aluno(
         &self,
-        mut user: Box<OptionUserSchema>,
+        mut user: Box<AlunoUpdateModel>,
         id: &ObjectId,
     ) -> Result<Option<UserOutput>, AppError> {
-        UpdateUserValidation::validate(&mut (user))?;
-        Ok(self.repository.update_one(user, id).await.map(|op|op.map(UserOutput::from))?)
+        let user = UpdateAlunoValidation::validate(&mut (user))?;
+        Ok(self.repository.update_one(&user, id).await.map(|op|op.map(UserOutput::from))?)
     }
 
     pub async fn delete_aluno(&self, id: &ObjectId) -> Result<bool, AppError> {

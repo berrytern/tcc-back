@@ -1,6 +1,6 @@
-pub mod aluno_controller;
-pub mod auth_controller;
-pub mod gestor_controller;
-pub mod professor_controller;
-pub mod solicitacao_controller;
-pub mod turma_controller;
+pub mod aluno;
+pub mod auth;
+pub mod gestor;
+pub mod professor;
+pub mod solicitacao;
+pub mod turma;

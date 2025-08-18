@@ -1,5 +1,6 @@
+use crate::application::models::aluno::AlunoUpdateModel;
 use crate::application::models::user::UserInput;
-use crate::application::services::aluno_service::AlunoService;
+use crate::application::services::aluno::AlunoService;
 use crate::{
     errors::AppError,
     infrastructure::database::schemas::user_schema::OptionUserSchema,
@@ -48,7 +49,7 @@ impl AlunoController {
 
     pub async fn update_aluno(
         &self,
-        user: Box<OptionUserSchema>,
+        user: Box<AlunoUpdateModel>,
         id: &ObjectId,
     ) -> Result<HttpResponse, AppError> {
         self.service.update_aluno(user, id).await.map(|result| {

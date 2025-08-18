@@ -1,3 +1,4 @@
+use crate::application::models::aluno::AlunoUpdateModel;
 use crate::application::models::user::{UserInput, UserOutput};
 use crate::di::d_injection::App;
 use crate::{
@@ -56,7 +57,7 @@ pub async fn create_aluno(app: Data<App>, user: Json<UserInput>) -> Result<impl 
 #[patch("/v1/alunos/{id}")]
 pub async fn update_aluno(
     app: Data<App>,
-    user: Json<OptionUserSchema>,
+    user: Json<AlunoUpdateModel>,
     id: Path<String>,
 ) -> Result<impl Responder, AppError> {
     let controller = &app.controllers.aluno;

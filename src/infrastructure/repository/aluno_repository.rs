@@ -35,7 +35,7 @@ impl AlunoRepository {
             Some(user)
         })
     }
-    pub async fn update_one<'a>(&self, user: Box<OptionUserSchema>, id: &ObjectId) ->  Result<Option<UserSchema>,BsonError> {
+    pub async fn update_one<'a>(&self, user: &OptionUserSchema, id: &ObjectId) ->  Result<Option<UserSchema>,BsonError> {
         let filter = doc!{"_id":id};
         match self.model.update_one(user, filter, None).await {
             Ok(up) => {

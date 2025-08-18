@@ -1,7 +1,8 @@
-pub mod create_user_validation;
-pub mod update_user_validation;
-pub mod create_solicitacao_validation;
-pub mod status_type_validator;
-pub mod update_solicitacao_validation;
-pub mod create_turma_validation;
-pub mod update_turma_validation;
+pub mod create_user;
+pub mod update_user;
+pub mod update_aluno;
+pub mod create_solicitacao;
+pub mod status_type;
+pub mod update_solicitacao;
+pub mod create_turma;
+pub mod update_turma;

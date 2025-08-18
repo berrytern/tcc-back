@@ -1,5 +1,5 @@
 use mongodb::bson::oid::ObjectId;
-use crate::{infrastructure::{database::schemas::turma_schema::{Turma, OptionTurma}, repository::turma_repository::TurmaRepository}, errors::AppError, port::query_filter::QueryOptions, application::validation::{update_turma_validation::UpdateTurmaValidation, create_turma_validation::CreateTurmaValidation}};
+use crate::{infrastructure::{database::schemas::turma_schema::{Turma, OptionTurma}, repository::turma_repository::TurmaRepository}, errors::AppError, port::query_filter::QueryOptions, application::validation::{update_turma::UpdateTurmaValidation, create_turma::CreateTurmaValidation}};
 
 #[derive(Clone)]
 pub struct TurmaService{

@@ -1,8 +1,8 @@
 use mongodb::bson::oid::ObjectId;
 use pwhash::bcrypt;
 use crate::application::models::user::{UserInput, UserOutput};
-use crate::application::validation::create_user_validation::CreateUserValidation;
-use crate::application::validation::update_user_validation::UpdateUserValidation;
+use crate::application::validation::create_user::CreateUserValidation;
+use crate::application::validation::update_user::UpdateUserValidation;
 use crate::{infrastructure::{repository::professor_repository::ProfessorRepository, database::schemas::user_schema::OptionUserSchema}, errors::AppError, port::query_filter::QueryOptions};
 
 #[derive(Clone)]

@@ -1,5 +1,5 @@
 use mongodb::bson::DateTime;
-use crate::application::validation::status_type_validator::StatusType;
+use crate::application::validation::status_type::StatusType;
 use crate::{errors::AppError, infrastructure::database::schemas::solicitacao_schema::SolicitacaoSchema};
 
 pub struct CreateSolicitacaoValidation{}

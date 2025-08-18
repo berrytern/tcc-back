@@ -4,17 +4,17 @@ use amqp_client_rust::api::eventbus::AsyncEventbusRabbitMQ;
 use amqp_client_rust::domain::config::{Config, ConfigOptions};
 
 use crate::application::models::user::UserOutput;
-use crate::application::services::auth_service::AuthService;
+use crate::application::services::auth::AuthService;
 use crate::application::services::{
-    aluno_service::AlunoService, gestor_service::GestorService,
-    professor_service::ProfessorService, solicitacao_service::SolicitacaoService,
-    turma_service::TurmaService,
+    aluno::AlunoService, gestor::GestorService,
+    professor::ProfessorService, solicitacao::SolicitacaoService,
+    turma::TurmaService,
 };
-use crate::controllers::auth_controller::AuthController;
+use crate::controllers::auth::AuthController;
 use crate::controllers::{
-    aluno_controller::AlunoController, gestor_controller::GestorController,
-    professor_controller::ProfessorController, solicitacao_controller::SolicitacaoController,
-    turma_controller::TurmaController,
+    aluno::AlunoController, gestor::GestorController,
+    professor::ProfessorController, solicitacao::SolicitacaoController,
+    turma::TurmaController,
 };
 use crate::infrastructure::database::schemas::auth_schema::Auth;
 use crate::infrastructure::database::schemas::solicitacao_schema::SolicitacaoSchema;

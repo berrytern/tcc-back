@@ -1,6 +1,6 @@
 use actix_web::HttpResponse;
 use mongodb::bson::oid::ObjectId;
-use crate::application::services::solicitacao_service::SolicitacaoService;
+use crate::application::services::solicitacao::SolicitacaoService;
 use crate::{infrastructure::database::schemas::solicitacao_schema::{SolicitacaoSchema, OptionSolicitacaoSchema}, errors::AppError, port::query_filter::QueryOptions};
 
 #[derive(Clone)]

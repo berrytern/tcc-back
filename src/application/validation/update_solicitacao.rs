@@ -1,6 +1,6 @@
 use mongodb::bson::DateTime;
 use crate::{errors::AppError, infrastructure::database::schemas::solicitacao_schema::OptionSolicitacaoSchema};
-use crate::application::validation::status_type_validator::StatusType;
+use crate::application::validation::status_type::StatusType;
 pub struct UpdateSolicitacaoValidation{}
 
 impl UpdateSolicitacaoValidation{

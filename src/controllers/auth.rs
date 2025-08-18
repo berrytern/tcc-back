@@ -1,5 +1,5 @@
 use crate::application::models::login::Login;
-use crate::application::services::auth_service::AuthService;
+use crate::application::services::auth::AuthService;
 use crate::errors::AppError;
 use crate::utils::settings::Env;
 use actix_web::HttpResponse;

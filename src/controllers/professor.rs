@@ -1,5 +1,5 @@
 use crate::application::models::user::UserInput;
-use crate::application::services::gestor_service::GestorService;
+use crate::application::services::professor::ProfessorService;
 use crate::{
     errors::AppError,
     infrastructure::database::schemas::user_schema::OptionUserSchema,
@@ -8,13 +8,13 @@ use crate::{
 use actix_web::HttpResponse;
 use mongodb::bson::oid::ObjectId;
 #[derive(Clone)]
-pub struct GestorController {
-    service: Box<GestorService>,
+pub struct ProfessorController {
+    service: Box<ProfessorService>,
 }
 
-impl GestorController {
-    pub fn new(service: Box<GestorService>) -> Self {
-        GestorController { service }
+impl ProfessorController {
+    pub fn new(service: Box<ProfessorService>) -> Self {
+        ProfessorController { service }
     }
 
     pub async fn get_one(&self, user: &mut OptionUserSchema) -> Result<HttpResponse, AppError> {
@@ -24,20 +24,20 @@ impl GestorController {
             .await
             .map(|result| HttpResponse::Ok().json(result))
     }
-    pub async fn get_all_gestor(
+    pub async fn get_all_professor(
         &self,
         user: &mut OptionUserSchema,
         options: QueryOptions,
     ) -> Result<HttpResponse, AppError> {
         self
             .service
-            .get_all_gestor(user, options)
+            .get_all_professor(user, options)
             .await
             .map(|result| HttpResponse::Ok().json(result))
     }
 
-    pub async fn create_gestor(&self, user: UserInput) -> Result<HttpResponse, AppError> {
-        self.service.create_gestor(user).await.map(|result| {
+    pub async fn create_professor(&self, user: UserInput) -> Result<HttpResponse, AppError> {
+        self.service.create_professor(user).await.map(|result| {
             if result.is_some() {
                 HttpResponse::Created().json(Some(result))
             } else {
@@ -46,24 +46,28 @@ impl GestorController {
         })
     }
 
-    pub async fn update_gestor(
+    pub async fn update_professor(
         &self,
         user: Box<OptionUserSchema>,
         id: &ObjectId,
     ) -> Result<HttpResponse, AppError> {
-        self.service.update_gestor(user, id).await.map(|result| {
-            if result.is_some() {
-                HttpResponse::Ok().json(Some(result))
-            } else {
-                HttpResponse::Ok().body("")
-            }
-        })
-    }
-
-    pub async fn delete_gestor(&self, id: &ObjectId) -> Result<HttpResponse, AppError> {
         self
             .service
-            .delete_gestor(id)
+            .update_professor(user, id)
+            .await
+            .map(|result| {
+                if result.is_some() {
+                    HttpResponse::Ok().json(Some(result))
+                } else {
+                    HttpResponse::Ok().body("")
+                }
+            })
+    }
+
+    pub async fn delete_professor(&self, id: &ObjectId) -> Result<HttpResponse, AppError> {
+        self
+            .service
+            .delete_professor(id)
             .await
             .map(|result| HttpResponse::Ok().json(result))
     }

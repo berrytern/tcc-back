@@ -1,6 +1,6 @@
 use actix_web::HttpResponse;
 use mongodb::bson::oid::ObjectId;
-use crate::application::services::turma_service::TurmaService;
+use crate::application::services::turma::TurmaService;
 use crate::{infrastructure::database::schemas::turma_schema::{Turma, OptionTurma}, errors::AppError, port::query_filter::QueryOptions};
 
 #[derive(Clone)]
