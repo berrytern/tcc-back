@@ -1,4 +1,4 @@
-use crate::application::models::aluno::AlunoUpdateModel;
+use crate::application::models::aluno::{AlunoUpdateModel, CreateAlunoModel};
 use crate::application::models::user::{UserInput, UserOutput};
 use crate::di::d_injection::App;
 use crate::{
@@ -14,7 +14,7 @@ use actix_web::{
 use mongodb::bson::oid::ObjectId;
 
 // al:r
-#[utoipa::path(responses((status = OK, body = UserOutput)))]
+#[utoipa::path(tag = "aluno", responses((status = OK, body = UserOutput)))]
 #[get("/v1/alunos/{id}")]
 pub async fn get_aluno(
     app: Data<App>,
@@ -29,7 +29,7 @@ pub async fn get_aluno(
         .await
 }
 // al:r
-#[utoipa::path(responses((status = OK, body = Vec<UserOutput>)))]
+#[utoipa::path(tag = "aluno", responses((status = OK, body = Vec<UserOutput>)))]
 #[get("/v1/alunos")]
 pub async fn get_all_aluno(
     app: Data<App>,
@@ -44,16 +44,16 @@ pub async fn get_all_aluno(
         .await
 }
 // al:c
-#[utoipa::path(responses((status = OK, body = UserOutput)))]
+#[utoipa::path(tag = "aluno", responses((status = OK, body = UserOutput)))]
 #[post("/v1/alunos")]
-pub async fn create_aluno(app: Data<App>, user: Json<UserInput>) -> Result<impl Responder, AppError> {
+pub async fn create_aluno(app: Data<App>, user: Json<CreateAlunoModel>) -> Result<impl Responder, AppError> {
     let controller = &app.controllers.aluno;
     controller
         .create_aluno(user.into_inner())
         .await
 }
 // al:u
-#[utoipa::path(responses((status = OK, body = UserOutput)))]
+#[utoipa::path(tag = "aluno", responses((status = OK, body = UserOutput)))]
 #[patch("/v1/alunos/{id}")]
 pub async fn update_aluno(
     app: Data<App>,
@@ -67,7 +67,7 @@ pub async fn update_aluno(
         .await
 }
 // al:d
-#[utoipa::path(responses((status = OK, body = bool)))]
+#[utoipa::path(tag = "aluno", responses((status = OK, body = bool)))]
 #[delete("/v1/alunos/{id}")]
 pub async fn delete_aluno(app: Data<App>, id: Path<String>) -> Result<impl Responder, AppError> {
     let controller = &app.controllers.aluno;

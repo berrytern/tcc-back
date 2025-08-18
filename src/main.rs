@@ -35,10 +35,6 @@ async fn main() {
 }*/
 
 
-#[derive(OpenApi)]
-#[openapi(paths(routes::auth::login))]
-struct ApiDoc;
-
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let env = load_env();
@@ -49,7 +45,7 @@ async fn main() -> std::io::Result<()> {
         println!("running");
         let app =App::new()
             .app_data(Data::new(app.clone()));
-        let (app, api) = app
+        let (app, mut api) = app
             .into_utoipa_app()
             .service(login)
             .service(get_all_aluno)
@@ -67,17 +63,22 @@ async fn main() -> std::io::Result<()> {
             .service(get_professor)
             .service(update_professor)
             .service(delete_professor)
-            .route("/v1/turma", get().to(get_all_turma))
-            .route("/v1/turma", post().to(create_turma))
-            .route("/v1/turma/one", get().to(get_one_turma))
-            .route("/v1/turma/{aluno_id}/{professor_id}", patch().to(update_turma))
-            .route("/v1/turma/{aluno_id}/{professor_id}", delete().to(delete_turma))
-            .route("/v1/solicitacoes", get().to(get_all_solicitacao))
-            .route("/v1/solicitacoes", post().to(create_solicitacao))
-            .route("/v1/solicitacoes/one", get().to(get_one_solicitacao))
-            .route("/v1/solicitacoes/{aluno_id}/{professor_id}", patch().to(update_solicitacao))
-            .route("/v1/solicitacoes/{aluno_id}/{professor_id}", delete().to(delete_solicitacao))
+            .service(get_all_turma)
+            .service(create_turma)
+            .service(get_one_turma)
+            .service(update_turma)
+            .service(delete_turma)
+            .service(get_all_solicitacao)
+            .service(create_solicitacao)
+            .service(get_one_solicitacao)
+            .service(update_solicitacao)
+            .service(delete_solicitacao)
             .split_for_parts();
+        api.info.title = "TCC API".to_string();
+        api.info.contact = Some(utoipa::openapi::ContactBuilder::new()
+            .name(Some("João M. C. Hluchan"))
+            .email(Some("berrytern@gmail.com"))
+            .build());
         app.service(
                 SwaggerUi::new("/swagger-ui/{_:.*}")
                     .url("/api-docs/openapi.json", api),

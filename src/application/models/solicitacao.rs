@@ -1,4 +1,7 @@
+use mongodb::bson::{DateTime};
 use serde::{Serialize, Deserialize};
+use utoipa::ToSchema;
+use crate::infrastructure::database::schemas::user_schema::MyObjectId;
 use crate::utils::functions::format_date;
 use crate::infrastructure::database::schemas::solicitacao_schema::{SolicitacaoSchema,OptionSolicitacaoSchema};
 
@@ -36,6 +39,29 @@ impl From<OptionSolicitacaoSchema> for Solicitacao {
             comment: if let Some(comment) = value.comment {comment} else {"".to_string()},
             created_at: if let Some(created_at) = value.created_at {created_at.to_string()} else {"".to_string()},
             updated_at: if let Some(updated_at) = value.updated_at {updated_at.to_string()} else {"".to_string()},
+        }
+    }
+}
+
+#[derive(Serialize,Deserialize,Clone,ToSchema)]
+pub struct CreateSolicitacaoModel{
+    pub id_aluno: MyObjectId,
+    pub id_professor: MyObjectId,
+    pub status: String,
+    pub description: String,
+    pub comment: String,
+}
+impl From<CreateSolicitacaoModel> for SolicitacaoSchema {
+    fn from(value: CreateSolicitacaoModel) -> Self {
+        Self {
+            id: None,
+            id_aluno: value.id_aluno,
+            id_professor: value.id_professor,
+            status: "pending".to_string(),
+            description: value.description,
+            comment: value.comment,
+            created_at: Some(DateTime::now().into()), // Will be set by the database
+            updated_at: Some(DateTime::now().into()), // Will be set by the database
         }
     }
 }

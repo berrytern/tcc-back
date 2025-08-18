@@ -1,8 +1,9 @@
-use crate::application::models::aluno::{AlunoUpdateModel};
+use crate::application::models::aluno::{AlunoUpdateModel, CreateAlunoModel};
 use crate::application::models::user::{UserInput, UserOutput};
 use crate::application::validation::{
-    create_user::CreateUserValidation, update_aluno::UpdateAlunoValidation,
+    create_user::CreateUserValidation
 };
+use crate::infrastructure::database::schemas::user_schema::UserSchema;
 use crate::{
     errors::AppError,
     infrastructure::{
@@ -38,8 +39,8 @@ impl AlunoService {
             
     }
 
-    pub async fn create_aluno(&self, mut user: UserInput) -> Result<Option<UserOutput>, AppError> {
-        let mut user = CreateUserValidation::validate(&mut (user), "aluno")?;
+    pub async fn create_aluno(&self, mut user: CreateAlunoModel) -> Result<Option<UserOutput>, AppError> {
+        let mut user: UserSchema = user.into();
         user.password = bcrypt::hash(user.password)?;
         Ok(self.repository.create(user).await
             .map(|opt_user| opt_user.map(UserOutput::from))?)
@@ -47,10 +48,10 @@ impl AlunoService {
 
     pub async fn update_aluno(
         &self,
-        mut user: Box<AlunoUpdateModel>,
+        user: Box<AlunoUpdateModel>,
         id: &ObjectId,
     ) -> Result<Option<UserOutput>, AppError> {
-        let user = UpdateAlunoValidation::validate(&mut (user))?;
+        let user: OptionUserSchema = (*user).into();
         Ok(self.repository.update_one(&user, id).await.map(|op|op.map(UserOutput::from))?)
     }
 

@@ -28,8 +28,8 @@ impl TurmaRepository {
         self.model.find(filter, options).await
     }
     pub async fn create<'a>(&self, mut turma: Box<Turma>) ->  Result<Option<Box<Turma>>,MongoDbError> {
-        turma.created_at = Some(DateTime::now());
-        turma.updated_at = Some(DateTime::now());
+        turma.created_at = Some(DateTime::now().into());
+        turma.updated_at = Some(DateTime::now().into());
         self.model.create(&turma).await.map(|_| {
             Some(turma)
         })
@@ -38,7 +38,7 @@ impl TurmaRepository {
         turma.id_aluno = None;
         turma.id_professor = None;
         turma.created_at = None;
-        turma.updated_at = Some(DateTime::now());
+        turma.updated_at = Some(DateTime::now().into());
         let filter = doc!{"aluno_id":aluno_id,"professor_id":prof_id};
         match self.model.update_one(turma, filter, None).await {
             Ok(up) => {

@@ -13,7 +13,7 @@ use actix_web::{
 use mongodb::bson::oid::ObjectId;
 
 // pf:r
-#[utoipa::path(responses((status = OK, body = UserOutput)))]
+#[utoipa::path(tag = "professor", responses((status = OK, body = UserOutput)))]
 #[get("/v1/professores/{id}")]
 pub async fn get_professor(
     app: Data<App>,
@@ -28,7 +28,7 @@ pub async fn get_professor(
         .await
 }
 // pf:r
-#[utoipa::path(responses((status = OK, body = Vec<UserOutput>)))]
+#[utoipa::path(tag = "professor", responses((status = OK, body = Vec<UserOutput>)))]
 #[get("/v1/professores")]
 pub async fn get_all_professor(
     app: Data<App>,
@@ -44,7 +44,7 @@ pub async fn get_all_professor(
 }
 
 // pf:c
-#[utoipa::path(responses((status = OK, body = UserOutput)))]
+#[utoipa::path(tag = "professor", responses((status = OK, body = UserOutput)))]
 #[post("/v1/professores")]
 pub async fn create_professor(
     app: Data<App>,
@@ -56,7 +56,7 @@ pub async fn create_professor(
         .await
 }
 // pf:u
-#[utoipa::path(responses((status = OK, body = UserOutput)))]
+#[utoipa::path(tag = "professor", responses((status = OK, body = UserOutput)))]
 #[patch("/v1/professores/{id}")]
 pub async fn update_professor(
     app: Data<App>,
@@ -70,7 +70,7 @@ pub async fn update_professor(
         .await
 }
 // pf:d
-#[utoipa::path(responses((status = OK, body = bool)))]
+#[utoipa::path(tag = "professor", responses((status = OK, body = bool)))]
 #[delete("/v1/professores/{id}")]
 pub async fn delete_professor(
     app: Data<App>,

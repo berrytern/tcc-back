@@ -11,7 +11,7 @@ impl UpdateSolicitacaoValidation{
             StatusType::validate(status)?;
         }
         solicitacao.created_at = None;
-        solicitacao.updated_at = Some(DateTime::now());
+        solicitacao.updated_at = Some(DateTime::now().into());
         Ok(())
     }
 }

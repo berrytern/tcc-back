@@ -8,7 +8,7 @@ impl UpdateTurmaValidation{
         user.id_aluno = None;
         user.id_professor = None;
         user.created_at = None;
-        user.updated_at = Some(DateTime::now());
+        user.updated_at = Some(DateTime::now().into());
         Ok(())
     }
 }

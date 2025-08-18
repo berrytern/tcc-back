@@ -1,6 +1,5 @@
 pub mod create_user;
 pub mod update_user;
-pub mod update_aluno;
 pub mod create_solicitacao;
 pub mod status_type;
 pub mod update_solicitacao;

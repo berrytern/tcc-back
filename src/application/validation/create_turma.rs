@@ -6,8 +6,8 @@ pub struct CreateTurmaValidation{}
 
 impl CreateTurmaValidation{
     pub fn validate(solicitacao: &mut Turma) -> Result<(),AppError> {
-        solicitacao.created_at = Some(DateTime::now());
-        solicitacao.updated_at = Some(DateTime::now());
+        solicitacao.created_at = Some(DateTime::now().into());
+        solicitacao.updated_at = Some(DateTime::now().into());
         Ok(())
     }
 }

@@ -8,7 +8,7 @@ use actix_web::{
 };
 
 
-#[utoipa::path(responses((status = OK, body = AccessToken)))]
+#[utoipa::path(tag = "auth", responses((status = OK, body = AccessToken)))]
 #[post("/v1/auth")]
 pub async fn login(app: Data<DI_APP>, query: Json<Login>) -> Result<impl Responder, AppError> {
     let controller = &app.controllers.auth;

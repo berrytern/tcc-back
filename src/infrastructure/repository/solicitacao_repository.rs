@@ -1,6 +1,6 @@
 use mongodb::bson::oid::ObjectId;
 use mongodb::{IndexModel,
-    bson::{DateTime,to_document, doc, extjson::de::Error as BsonError},
+    bson::{to_document, doc, extjson::de::Error as BsonError},
     options::IndexOptions};
 use mongodb::error::Error as MongoDbError;
 use crate::errors::AppError;
@@ -29,10 +29,8 @@ impl SolicitacaoRepository {
         self.model.find(filter, options).await
     }
     pub async fn create<'a>(&self, mut solicitacao: Box<SolicitacaoSchema>) ->  Result<Option<Box<SolicitacaoSchema>>,AppError> {
-        solicitacao.status = "pending".to_string();
-        solicitacao.created_at = Some(DateTime::now());
-        solicitacao.updated_at = Some(DateTime::now());
-        Ok(self.model.create(&solicitacao).await.map(|_| {
+        Ok(self.model.create(&solicitacao).await.map(|op_id| {
+            solicitacao.id = op_id;
             Some(solicitacao)
         })?)
     }

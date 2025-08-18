@@ -1,5 +1,4 @@
-use crate::application::models::aluno::AlunoUpdateModel;
-use crate::application::models::user::UserInput;
+use crate::application::models::aluno::{AlunoUpdateModel, CreateAlunoModel};
 use crate::application::services::aluno::AlunoService;
 use crate::{
     errors::AppError,
@@ -37,7 +36,7 @@ impl AlunoController {
             .map(|result| HttpResponse::Ok().json(result))
     }
 
-    pub async fn create_aluno(&self, user: UserInput) -> Result<HttpResponse, AppError> {
+    pub async fn create_aluno(&self, user: CreateAlunoModel) -> Result<HttpResponse, AppError> {
         self.service.create_aluno(user).await.map(|result| {
             if result.is_some() {
                 HttpResponse::Created().json(Some(result))
