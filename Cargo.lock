@@ -2223,6 +2223,7 @@ dependencies = [
  "dotenv",
  "fancy-regex",
  "futures",
+ "futures-util",
  "jsonwebtoken",
  "mongodb",
  "once_cell",

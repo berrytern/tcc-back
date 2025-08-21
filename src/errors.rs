@@ -10,6 +10,7 @@ use mongodb::error::{WriteFailure,WriteConcernError,WriteError};
 pub enum AppErrorType {
     InternalError,
     ValidationError,
+    UnauthorizedError,
     ConflictError,
 }
 
@@ -36,12 +37,23 @@ impl AppError {
         match self {
             AppError {
                 error_type: AppErrorType::ValidationError,
+                message: None,
                 ..
             } => "The body content is invalid".to_string(),
             AppError {
                 error_type: AppErrorType::ConflictError,
+                message: None,
                 ..
             } => "Unique field value already in used".to_string(),
+            AppError {
+                error_type: AppErrorType::UnauthorizedError,
+                message: None,
+                ..
+            } => "Unauthorized access".to_string(),
+            AppError {
+                message: Some(msg),
+                ..
+            } => msg.to_string(),
             _ => "An unexpected error has occurred".to_string(),
         }
     }
@@ -143,6 +155,7 @@ impl ResponseError for AppError {
         match self.error_type {
             AppErrorType::InternalError => StatusCode::INTERNAL_SERVER_ERROR,
             AppErrorType::ValidationError => StatusCode::BAD_REQUEST,
+            AppErrorType::UnauthorizedError => StatusCode::UNAUTHORIZED,
             AppErrorType::ConflictError => StatusCode::CONFLICT,
         }
     }

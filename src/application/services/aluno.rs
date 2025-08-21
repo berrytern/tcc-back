@@ -1,8 +1,5 @@
 use crate::application::models::aluno::{AlunoUpdateModel, CreateAlunoModel};
-use crate::application::models::user::{UserInput, UserOutput};
-use crate::application::validation::{
-    create_user::CreateUserValidation
-};
+use crate::application::models::user::UserOutput;
 use crate::infrastructure::database::schemas::user_schema::UserSchema;
 use crate::{
     errors::AppError,
@@ -39,7 +36,7 @@ impl AlunoService {
             
     }
 
-    pub async fn create_aluno(&self, mut user: CreateAlunoModel) -> Result<Option<UserOutput>, AppError> {
+    pub async fn create_aluno(&self, user: CreateAlunoModel) -> Result<Option<UserOutput>, AppError> {
         let mut user: UserSchema = user.into();
         user.password = bcrypt::hash(user.password)?;
         Ok(self.repository.create(user).await

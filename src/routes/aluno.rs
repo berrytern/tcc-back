@@ -1,5 +1,6 @@
-use crate::application::models::aluno::{AlunoUpdateModel, CreateAlunoModel};
-use crate::application::models::user::{UserInput, UserOutput};
+use crate::application::{middlewares::auth::verify_access_by_scope, models::{
+    aluno::{AlunoUpdateModel, CreateAlunoModel}, json_token::JsonToken, user::UserOutput
+}};
 use crate::di::d_injection::App;
 use crate::{
     errors::AppError,
@@ -20,7 +21,9 @@ pub async fn get_aluno(
     app: Data<App>,
     query: Query<OptionUserSchema>,
     id: Path<String>,
+    jwt_token: JsonToken
 ) -> Result<impl Responder, AppError> {
+    verify_access_by_scope(&jwt_token, "al:r")?;
     let controller = &app.controllers.aluno;
     let mut user = query.into_inner();
     user.id = Some(ObjectId::parse_str(id.into_inner())?.into());
@@ -35,7 +38,9 @@ pub async fn get_all_aluno(
     app: Data<App>,
     query: Query<OptionUserSchema>,
     options: Query<QueryFilter>,
+    jwt_token: JsonToken
 ) -> Result<impl Responder, AppError> {
+    verify_access_by_scope(&jwt_token, "al:r")?;
     let controller = &app.controllers.aluno;
     let options = options.into_inner();
     let mut user = query.into_inner();
@@ -46,7 +51,8 @@ pub async fn get_all_aluno(
 // al:c
 #[utoipa::path(tag = "aluno", responses((status = OK, body = UserOutput)))]
 #[post("/v1/alunos")]
-pub async fn create_aluno(app: Data<App>, user: Json<CreateAlunoModel>) -> Result<impl Responder, AppError> {
+pub async fn create_aluno(app: Data<App>, user: Json<CreateAlunoModel>, jwt_token: JsonToken) -> Result<impl Responder, AppError> {
+    verify_access_by_scope(&jwt_token, "al:c")?;
     let controller = &app.controllers.aluno;
     controller
         .create_aluno(user.into_inner())
@@ -59,7 +65,9 @@ pub async fn update_aluno(
     app: Data<App>,
     user: Json<AlunoUpdateModel>,
     id: Path<String>,
+    jwt_token: JsonToken
 ) -> Result<impl Responder, AppError> {
+    verify_access_by_scope(&jwt_token, "al:u")?;
     let controller = &app.controllers.aluno;
     let id = ObjectId::parse_str(id.into_inner())?;
     controller
@@ -69,7 +77,8 @@ pub async fn update_aluno(
 // al:d
 #[utoipa::path(tag = "aluno", responses((status = OK, body = bool)))]
 #[delete("/v1/alunos/{id}")]
-pub async fn delete_aluno(app: Data<App>, id: Path<String>) -> Result<impl Responder, AppError> {
+pub async fn delete_aluno(app: Data<App>, id: Path<String>, jwt_token: JsonToken) -> Result<impl Responder, AppError> {
+    verify_access_by_scope(&jwt_token, "al:d")?;
     let controller = &app.controllers.aluno;
     let id = ObjectId::parse_str(id.into_inner())?;
     controller

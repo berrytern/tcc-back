@@ -6,10 +6,12 @@ mod routes;
 mod infrastructure;
 mod utils;
 mod errors;
-use actix_web::{App, HttpServer, web::{Data,get,post,patch,delete}};
+use actix_web::{App, HttpServer, web::Data};
+use once_cell::sync::Lazy;
 use utoipa_actix_web::AppExt;
 use utoipa_swagger_ui::SwaggerUi;
 use crate::di::d_injection::build;
+use crate::utils::settings::Env;
 use routes::auth::login;
 use routes::aluno::{get_aluno,create_aluno,update_aluno,delete_aluno, get_all_aluno};
 use routes::gestor::{get_gestor,create_gestor,update_gestor,delete_gestor, get_all_gestor};
@@ -17,7 +19,6 @@ use routes::professor::{get_professor,create_professor,update_professor,delete_p
 use routes::solicitacao::{get_one_solicitacao,create_solicitacao,update_solicitacao,delete_solicitacao, get_all_solicitacao};
 use routes::turma::{get_one_turma,create_turma,update_turma,delete_turma, get_all_turma};
 use utils::settings::load_env;
-use utoipa::{OpenApi};
 
 /*async fn manual_hello() -> impl Responder {
     HttpResponse::Ok().body("Hey there!")
@@ -33,16 +34,15 @@ async fn main() {
         "name": "jose".to_string()}.into()).await.expect("err");
     println!("result: {:?}", result);
 }*/
-
+pub static ENV: Lazy<Env> = Lazy::new(|| load_env());
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let env = load_env();
-    let app = build(&env).await;
+    let app = build(&ENV).await;
 
 
     HttpServer::new(move || {
-        println!("running");
         let app =App::new()
             .app_data(Data::new(app.clone()));
         let (app, mut api) = app
