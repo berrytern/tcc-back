@@ -18,7 +18,7 @@ utoipa = { version="5.4.0", features=["actix_extras"] }
 utoipa-actix-web = "0.1"
 async-trait = "0.1.74"
 mongodb="2"
-regex = "1.10.2"
+regex = "1.11.2"
 once_cell = "1.18.0"
 amqp-client-rust = "0.0.3-alpha.2"
 utoipa-swagger-ui = { version = "9", features = ["actix-web"] }
