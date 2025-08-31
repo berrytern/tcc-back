@@ -18,11 +18,17 @@ pub async fn get_connection(uri: &str) -> Result<Client, mongodb::error::Error> 
     Client::with_options(client_options)
 }
 #[derive(Clone)]
-pub struct RepoModel<T>{
+pub struct RepoModel<T>
+where
+    T: Send + Sync,
+{
     collection: Box<mongodb::Collection<T>>,
 }
 
-impl<T> RepoModel<T>  {
+impl<T> RepoModel<T>
+where
+    T: Send + Sync,
+{
     pub async fn new(db: &mongodb::Database, collection_name: &str) ->  Self {
         RepoModel::<T>{
             collection: Box::new(db.collection::<T>(collection_name))
@@ -30,7 +36,7 @@ impl<T> RepoModel<T>  {
     }
 
     pub async fn create_index(&self, index: IndexModel, opt: Option<CreateIndexOptions>)-> Result<CreateIndexResult, MongoDbError>{
-        self.collection.create_index(index, opt).await
+        self.collection.create_index(index).with_options(opt).await
     }
 
     pub async fn find_one(&self, filter: Document) -> Result<Option<T>, BsonError>
@@ -38,7 +44,7 @@ impl<T> RepoModel<T>  {
     T: DeserializeOwned + Unpin + Send + Sync,
     {
         let result= self.collection.find_one(
-            filter, None
+            filter
         ).await.expect("Error on creating operation");
         Ok(result)
     }
@@ -50,9 +56,9 @@ impl<T> RepoModel<T>  {
         let mut result: Vec<T> = Vec::new();
         let options: Option<FindOptions> = Some(opt.into());
         let mut cursor= self.collection.find(
-            filter, options
-        ).await.expect("Error on find operation");
-        
+            filter
+        ).with_options(options).await.expect("Error on find operation");
+
         while let Ok(Some(item)) = cursor.try_next().await {
             result.push(item)
         }
@@ -64,7 +70,7 @@ impl<T> RepoModel<T>  {
     T: Serialize,
     {
         self.collection.insert_one(
-            data, None
+            data
         ).await
             .map(|op| Some(op.inserted_id.as_object_id().unwrap().into()))
     }
@@ -73,20 +79,18 @@ impl<T> RepoModel<T>  {
     where
     T: Serialize,
     {
-        self.collection.delete_one(filter, None).await
+        self.collection.delete_one(filter).await
             .map(|result| result.deleted_count != 0)
     }
 
-}
-impl<T> RepoModel<T>{
     pub async fn update_one<G>(&self, data: G, filter: Document, options: Option<UpdateOptions>) -> Result<UpdateResult, BsonError> 
     where
     G: Serialize + std::convert::From<G>,
     {
         let d = to_bson::<G>(&data).expect("Error on bson conversion");
-        let result= self.collection.update_one(
-            filter, doc!{"$set": d}, options
-        ).await.expect("Error on creating operation");
+        let result= self.collection.update_one(filter, doc!{"$set": d})
+            .with_options(options)
+            .await.expect("Error on creating operation");
         Ok(result)
     }
 }
