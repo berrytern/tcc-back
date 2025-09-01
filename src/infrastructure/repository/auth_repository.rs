@@ -23,7 +23,7 @@ impl AuthRepository {
         let filter = to_document(&auth).expect("error converting to document");
         self.model.find(filter, options).await
     }
-    pub async fn create<'a>(&self, mut auth: Box<Auth>) ->  Result<Option<Box<Auth>>,MongoDbError> {
+    pub async fn create(&self, mut auth: Box<Auth>) ->  Result<Option<Box<Auth>>,MongoDbError> {
         self.model.create(&auth).await.map(|op| {
             if let Some(id) = op {
                 auth.id = *id;
@@ -31,7 +31,7 @@ impl AuthRepository {
             Some(auth)
         })
     }
-    pub async fn update_one<'a>(&self, auth: Box<Auth>, id: &ObjectId) ->  Result<Option<Auth>,BsonError> {
+    pub async fn update_one(&self, auth: Box<Auth>, id: &ObjectId) ->  Result<Option<Auth>,BsonError> {
         let filter = doc!{"_id":id};
         let options = Some(UpdateOptions::builder().upsert(true).build());
         match self.model.update_one(auth, filter, options).await {
@@ -45,7 +45,7 @@ impl AuthRepository {
             Err(err) => Err(err),
         }
     }
-    pub async fn delete_one<'a>(&self, email: &String) -> Result<bool,MongoDbError> {
+    pub async fn delete_one(&self, email: &String) -> Result<bool,MongoDbError> {
         let filter = doc!{"email": email};
         self.model.delete_one(filter).await
     }

@@ -29,13 +29,13 @@ impl AlunoRepository {
         let filter = to_document(&user).expect("error converting to document");
         self.model.find(filter, options).await
     }
-    pub async fn create<'a>(&self, mut user: UserSchema) ->  Result<Option<UserSchema>,MongoDbError> {
+    pub async fn create(&self, mut user: UserSchema) ->  Result<Option<UserSchema>,MongoDbError> {
         self.model.create(&user).await.map(|op| {
             user.id = op;
             Some(user)
         })
     }
-    pub async fn update_one<'a>(&self, user: &OptionUserSchema, id: &ObjectId) ->  Result<Option<UserSchema>,BsonError> {
+    pub async fn update_one(&self, user: &OptionUserSchema, id: &ObjectId) ->  Result<Option<UserSchema>,BsonError> {
         let filter = doc!{"_id":id};
         match self.model.update_one(user, filter, None).await {
             Ok(up) => {
@@ -48,7 +48,7 @@ impl AlunoRepository {
             Err(err) => Err(err),
         }
     }
-    pub async fn delete_one<'a>(&self, id: &ObjectId) -> Result<bool,MongoDbError> {
+    pub async fn delete_one(&self, id: &ObjectId) -> Result<bool,MongoDbError> {
         let filter = doc!{"_id": id, "user_type": "aluno"};
         self.model.delete_one(filter).await
     }

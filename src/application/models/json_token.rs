@@ -7,7 +7,7 @@ use crate::ENV;
 
 
 static DECODING_KEY: Lazy<DecodingKey> = Lazy::new(|| {
-    DecodingKey::from_secret(&ENV.jwt_secret.as_bytes())
+    DecodingKey::from_secret(ENV.jwt_secret.as_bytes())
 });
 static VALIDATION: Lazy<Validation> = Lazy::new(|| {
     Validation::new(Algorithm::HS256)

@@ -53,6 +53,18 @@ services:
       driver: json-file
       options:
         max-size: 100m
+  redis:
+    image: redis
+    container_name: tcc-redis
+    ports:
+      - 6379:6379
+    restart: always
+    networks:
+      - tcc-network
+    logging:
+      driver: json-file
+      options:
+        max-size: 100m
 
 volumes:
   tcc-mongo-data:

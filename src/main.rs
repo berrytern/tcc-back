@@ -34,7 +34,7 @@ async fn main() {
         "name": "jose".to_string()}.into()).await.expect("err");
     println!("result: {:?}", result);
 }*/
-pub static ENV: Lazy<Env> = Lazy::new(|| load_env());
+pub static ENV: Lazy<Env> = Lazy::new(load_env);
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {

@@ -14,7 +14,7 @@ pub struct UserInput {
 
 
 impl UserInput {
-    pub fn into_schema(&self, user_type: &str, created_at: MyDateTime, updated_at: MyDateTime) -> UserSchema {
+    pub fn into_schema(self, user_type: &str, created_at: MyDateTime, updated_at: MyDateTime) -> UserSchema {
         UserSchema {
             id: None,
             name: self.name.to_owned(),

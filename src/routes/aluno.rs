@@ -7,7 +7,7 @@ use crate::{
     infrastructure::database::schemas::user_schema::OptionUserSchema,
     port::query_filter::QueryFilter,
 };
-use actix_web::{delete, get, patch, post};
+use actix_web::{delete, get, http::header, patch, post, HttpResponse};
 use actix_web::{
     web::{Data, Json, Path, Query},
     Responder,
@@ -41,18 +41,29 @@ pub async fn get_all_aluno(
     jwt_token: JsonToken
 ) -> Result<impl Responder, AppError> {
     verify_access_by_scope(&jwt_token, "al:r")?;
-    let controller = &app.controllers.aluno;
-    let options = options.into_inner();
-    let mut user = query.into_inner();
-    controller
-        .get_all_aluno(&mut (user), options.into())
-        .await
+    let mut user: OptionUserSchema = query.into_inner();
+    user.user_type = Some("aluno".to_string());
+    let redis = &mut app.redis_connection.clone();
+    match redis.send_packed_command(redis::cmd("GET").arg(format!("/v1/alunos?{user}"))).await {
+        Ok(redis::Value::BulkString(string))=>{
+            Ok(HttpResponse::Ok().append_header(header::ContentType::json()).body(string))
+        }
+        _ => {
+        let controller = &app.controllers.aluno;
+        let options = options.into_inner();
+        controller
+            .get_all_aluno(&mut (user), options.into(), Some(redis.to_owned()))
+            .await
+        }
+    }
 }
 // al:c
 #[utoipa::path(tag = "aluno", responses((status = OK, body = UserOutput)))]
 #[post("/v1/alunos")]
 pub async fn create_aluno(app: Data<App>, user: Json<CreateAlunoModel>, jwt_token: JsonToken) -> Result<impl Responder, AppError> {
+    println!("here");
     verify_access_by_scope(&jwt_token, "al:c")?;
+    println!("here2");
     let controller = &app.controllers.aluno;
     controller
         .create_aluno(user.into_inner())

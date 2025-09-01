@@ -28,13 +28,13 @@ impl SolicitacaoRepository {
         let filter = to_document(solicitacao).expect("error converting to document");
         self.model.find(filter, options).await
     }
-    pub async fn create<'a>(&self, mut solicitacao: Box<SolicitacaoSchema>) ->  Result<Option<Box<SolicitacaoSchema>>,AppError> {
+    pub async fn create(&self, mut solicitacao: Box<SolicitacaoSchema>) ->  Result<Option<Box<SolicitacaoSchema>>,AppError> {
         Ok(self.model.create(&solicitacao).await.map(|op_id| {
             solicitacao.id = op_id;
             Some(solicitacao)
         })?)
     }
-    pub async fn update_one<'a>(&self, solicitacao: Box<OptionSolicitacaoSchema>, aluno_id: &ObjectId, prof_id: &ObjectId) ->  Result<Option<SolicitacaoSchema>,AppError> {
+    pub async fn update_one(&self, solicitacao: Box<OptionSolicitacaoSchema>, aluno_id: &ObjectId, prof_id: &ObjectId) ->  Result<Option<SolicitacaoSchema>,AppError> {
         let filter = doc!{"aluno_id":aluno_id,"professor_id":prof_id};
         match self.model.update_one(solicitacao, filter, None).await {
             Ok(up) => {
@@ -47,7 +47,7 @@ impl SolicitacaoRepository {
             Err(err) => Err(AppError::from(err)),
         }
     }
-    pub async fn delete_one<'a>(&self, aluno_id: &ObjectId, prof_id: &ObjectId) -> Result<bool,MongoDbError> {
+    pub async fn delete_one(&self, aluno_id: &ObjectId, prof_id: &ObjectId) -> Result<bool,MongoDbError> {
         let filter = doc!{"id_aluno": aluno_id, "id_professor": prof_id};
         self.model.delete_one(filter).await
     }

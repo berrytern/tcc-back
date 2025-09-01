@@ -27,14 +27,14 @@ impl TurmaRepository {
         let filter = to_document(turma).expect("error converting to document");
         self.model.find(filter, options).await
     }
-    pub async fn create<'a>(&self, mut turma: Box<Turma>) ->  Result<Option<Box<Turma>>,MongoDbError> {
+    pub async fn create(&self, mut turma: Box<Turma>) ->  Result<Option<Box<Turma>>,MongoDbError> {
         turma.created_at = Some(DateTime::now().into());
         turma.updated_at = Some(DateTime::now().into());
         self.model.create(&turma).await.map(|_| {
             Some(turma)
         })
     }
-    pub async fn update_one<'a>(&self, mut turma: Box<OptionTurma>, aluno_id: &ObjectId, prof_id: &ObjectId) ->  Result<Option<Turma>,BsonError> {
+    pub async fn update_one(&self, mut turma: Box<OptionTurma>, aluno_id: &ObjectId, prof_id: &ObjectId) ->  Result<Option<Turma>,BsonError> {
         turma.id_aluno = None;
         turma.id_professor = None;
         turma.created_at = None;
@@ -51,7 +51,7 @@ impl TurmaRepository {
             Err(err) => Err(err),
         }
     }
-    pub async fn delete_one<'a>(&self, aluno_id: &ObjectId, prof_id: &ObjectId) -> Result<bool,MongoDbError> {
+    pub async fn delete_one(&self, aluno_id: &ObjectId, prof_id: &ObjectId) -> Result<bool,MongoDbError> {
         let filter = doc!{"id_aluno": aluno_id, "id_professor": prof_id};
         self.model.delete_one(filter).await
     }

@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 pub static RE_EMAIL: Lazy<Regex> = Lazy::new(|| Regex::new(r"^[\w\.-]+@[\w\.-]+\.\w+$").unwrap());
 pub static RE_NAME: Lazy<Regex> = Lazy::new(|| Regex::new(r"^[A-Za-z\s]+$").unwrap());
-pub static RE_PASSWORD: Lazy<Regex2> = Lazy::new(|| Regex2::new(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$").unwrap());
+pub static RE_PASSWORD: Lazy<Regex2> = Lazy::new(|| Regex2::new(r"^((?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,})$").unwrap());
 
 
 #[derive(Debug,Serialize,Clone,ToSchema)]

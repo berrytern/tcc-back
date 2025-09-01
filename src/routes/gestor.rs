@@ -26,8 +26,8 @@ pub async fn get_all_gestor(app: Data<App>, query: Query<OptionUserSchema>, opti
 // gs:c
 #[utoipa::path(tag = "gestor", responses((status = OK, body = UserOutput)))]
 #[post("/v1/gestores")]
-pub async fn create_gestor(app: Data<App>, user: Json<UserInput>, jwt_token: JsonToken) -> Result<impl Responder, AppError> {
-    verify_access_by_scope(&jwt_token, "gs:c")?;
+pub async fn create_gestor(app: Data<App>, user: Json<UserInput>) -> Result<impl Responder, AppError> {
+    // verify_access_by_scope(&jwt_token, "gs:c")?;
     let controller = &app.controllers.gestor;
     controller.create_gestor(user.into_inner()).await
 }

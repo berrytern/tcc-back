@@ -2,6 +2,7 @@ use std::borrow::BorrowMut;
 
 use amqp_client_rust::api::eventbus::AsyncEventbusRabbitMQ;
 use amqp_client_rust::domain::config::{Config, ConfigOptions};
+use redis::aio::MultiplexedConnection;
 
 use crate::application::models::user::UserOutput;
 use crate::application::services::auth::AuthService;
@@ -24,6 +25,7 @@ use crate::infrastructure::database::{
     connection::{get_connection, RepoModel},
     schemas::user_schema::UserSchema,
 };
+use crate::infrastructure::redis::client::init_redis_connection;
 use crate::infrastructure::repository::auth_repository::AuthRepository;
 use crate::infrastructure::repository::solicitacao_repository::SolicitacaoRepository;
 use crate::infrastructure::repository::user_repository::UserRepository;
@@ -47,6 +49,7 @@ pub struct Controller {
 #[derive(Clone)]
 pub struct App {
     pub controllers: Controller,
+    pub redis_connection: MultiplexedConnection,
     pub env: Env,
 }
 
@@ -62,6 +65,7 @@ pub async fn build(env: &Env) -> App {
     let eventbus = AsyncEventbusRabbitMQ::new(
         config
     ).await;
+    let redis_connection = init_redis_connection().await.expect("Cannot connect to Redis");
     let client = get_connection(&env.mongodb_uri)
         .await
         .expect("Cannot connect to MongoDb");
@@ -110,6 +114,7 @@ pub async fn build(env: &Env) -> App {
             solicitacao: SolicitacaoController::new(Box::new(solicitacao)),
             turma: TurmaController::new(Box::new(turma)),
         },
+        redis_connection,
         env: env.clone(),
     }
 }

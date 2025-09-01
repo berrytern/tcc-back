@@ -26,8 +26,8 @@ impl GestorService {
             .get_all(user, options).await.map( |item| item.into_iter().map(UserOutput::from).collect::<Vec<UserOutput>>())?)
     }
     
-    pub async fn create_gestor(&self, mut user: UserInput) -> Result<Option<UserOutput>, AppError> {
-        let mut user = CreateUserValidation::validate(&mut(user), "gestor")?;
+    pub async fn create_gestor(&self, user: UserInput) -> Result<Option<UserOutput>, AppError> {
+        let mut user = CreateUserValidation::validate(user, "gestor")?;
         user.password = bcrypt::hash(user.password)?;
         user.matricula = None;
         Ok(self.repository.create(user).await

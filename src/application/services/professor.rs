@@ -25,9 +25,9 @@ impl ProfessorService {
             .repository
             .get_all(user, options).await.map( |item| item.into_iter().map(UserOutput::from).collect::<Vec<UserOutput>>())?)
     }
-    
-    pub async fn create_professor(&self, mut user: UserInput) -> Result<Option<UserOutput>, AppError> {
-        let mut user = CreateUserValidation::validate(&mut(user), "professor")?;
+
+    pub async fn create_professor(&self, user: UserInput) -> Result<Option<UserOutput>, AppError> {
+        let mut user = CreateUserValidation::validate(user, "professor")?;
         user.password = bcrypt::hash(user.password)?;
         Ok(self.repository.create(user).await
             .map(|opt_user| opt_user.map(UserOutput::from))?)

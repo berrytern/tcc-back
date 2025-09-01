@@ -1,4 +1,5 @@
 use actix_web::{error::ResponseError, http::StatusCode, HttpResponse};
+use redis::RedisError;
 use serde::Serialize;
 use std::fmt::{self, Display};
 use mongodb::bson::extjson::de::Error as BsonError;
@@ -138,6 +139,15 @@ impl From<MongoDbError> for AppError {
             message: None, 
             description: Some(error.to_string()),
             error_type: AppErrorType::ValidationError,
+        }
+    }
+}
+impl From<RedisError> for AppError {
+    fn from(error: RedisError) -> AppError {
+        AppError {
+            message: None, 
+            description: Some(error.to_string()),
+            error_type: AppErrorType::InternalError,
         }
     }
 }
