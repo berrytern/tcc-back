@@ -2,7 +2,7 @@ use mongodb::bson::DateTime;
 use serde::{Serialize,Deserialize};
 use utoipa::{ToSchema};
 
-use crate::{infrastructure::database::schemas::user_schema::{OptionUserSchema, UserSchema}, utils::regex::{Email, Name, Password}};
+use crate::{infrastructure::database::schemas::user_schema::{MyDateTime, OptionUserSchema, UserSchema}, port::query_filter::QueryFilter, utils::regex::{Email, Name, Password}};
 
 #[derive(Serialize,Deserialize,Clone,ToSchema)]
 pub struct CreateAlunoModel {
@@ -51,6 +51,30 @@ impl From<AlunoUpdateModel> for OptionUserSchema {
             user_type: None,
             created_at: None,
             updated_at: Some(DateTime::now().into()),
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+pub struct AlunoQueryModel {
+    pub name: Option<String>,
+    pub email: Option<String>,
+    pub matricula: Option<String>,
+    pub password: Option<String>,
+    pub created_at: Option<MyDateTime>,
+    pub updated_at: Option<MyDateTime>,
+}
+
+impl From<AlunoQueryModel> for OptionUserSchema {
+    fn from(user: AlunoQueryModel) -> Self {
+        OptionUserSchema {
+            id: None,
+            name: user.name,
+            email: user.email,
+            matricula: user.matricula,
+            user_type: Some("aluno".to_string()),
+            created_at: user.created_at,
+            updated_at: user.updated_at,
         }
     }
 }

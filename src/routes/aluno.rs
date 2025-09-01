@@ -1,5 +1,5 @@
 use crate::application::{middlewares::auth::verify_access_by_scope, models::{
-    aluno::{AlunoUpdateModel, CreateAlunoModel}, json_token::JsonToken, user::UserOutput
+    aluno::{AlunoQueryModel, AlunoUpdateModel, CreateAlunoModel}, json_token::JsonToken, user::UserOutput
 }};
 use crate::di::d_injection::App;
 use crate::{
@@ -19,14 +19,15 @@ use mongodb::bson::oid::ObjectId;
 #[get("/v1/alunos/{id}")]
 pub async fn get_aluno(
     app: Data<App>,
-    query: Query<OptionUserSchema>,
+    query: Query<AlunoQueryModel>,
     id: Path<String>,
     jwt_token: JsonToken
 ) -> Result<impl Responder, AppError> {
     verify_access_by_scope(&jwt_token, "al:r")?;
-    let controller = &app.controllers.aluno;
-    let mut user = query.into_inner();
+    let user: AlunoQueryModel = query.into_inner();
+    let mut user: OptionUserSchema = user.into();
     user.id = Some(ObjectId::parse_str(id.into_inner())?.into());
+    let controller = &app.controllers.aluno;
     controller
         .get_one(&mut (user))
         .await
@@ -36,13 +37,13 @@ pub async fn get_aluno(
 #[get("/v1/alunos")]
 pub async fn get_all_aluno(
     app: Data<App>,
-    query: Query<OptionUserSchema>,
+    query: Query<AlunoQueryModel>,
     options: Query<QueryFilter>,
     jwt_token: JsonToken
 ) -> Result<impl Responder, AppError> {
     verify_access_by_scope(&jwt_token, "al:r")?;
-    let mut user: OptionUserSchema = query.into_inner();
-    user.user_type = Some("aluno".to_string());
+    let user: AlunoQueryModel = query.into_inner();
+    let user: OptionUserSchema = user.into();
     let redis = &mut app.redis_connection.clone();
     match redis.send_packed_command(redis::cmd("GET").arg(format!("/v1/alunos?{user}"))).await {
         Ok(redis::Value::BulkString(string))=>{
@@ -52,7 +53,7 @@ pub async fn get_all_aluno(
         let controller = &app.controllers.aluno;
         let options = options.into_inner();
         controller
-            .get_all_aluno(&mut (user), options.into(), Some(redis.to_owned()))
+            .get_all_aluno(&mut (user.into()), options.into(), Some(redis.to_owned()))
             .await
         }
     }
