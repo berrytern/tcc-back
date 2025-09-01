@@ -8,6 +8,6 @@ pub fn verify_access_by_scope(jwt_token: &JsonToken, scope: &str) -> Result<(), 
     if jwt_token.scope.contains(scope) {
         Ok(())
     } else {
-        Err(AppError::new(Some("Unauthorized: Insufficient scope".to_string()), None, AppErrorType::UnauthorizedError))
+        Err(AppError::new(Some("Unauthorized: Insufficient scope".to_string()), None, AppErrorType::Unauthorized))
     }
 }

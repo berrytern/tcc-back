@@ -9,10 +9,10 @@ use mongodb::error::{WriteFailure,WriteConcernError,WriteError};
 
 #[derive(Debug)]
 pub enum AppErrorType {
-    InternalError,
-    ValidationError,
-    UnauthorizedError,
-    ConflictError,
+    Internal,
+    Validation,
+    Unauthorized,
+    Conflict,
 }
 
 #[derive(Debug)]
@@ -37,17 +37,17 @@ impl AppError {
     pub fn get_message(&self) -> String {
         match self {
             AppError {
-                error_type: AppErrorType::ValidationError,
+                error_type: AppErrorType::Validation,
                 message: None,
                 ..
             } => "The body content is invalid".to_string(),
             AppError {
-                error_type: AppErrorType::ConflictError,
+                error_type: AppErrorType::Conflict,
                 message: None,
                 ..
             } => "Unique field value already in used".to_string(),
             AppError {
-                error_type: AppErrorType::UnauthorizedError,
+                error_type: AppErrorType::Unauthorized,
                 message: None,
                 ..
             } => "Unauthorized access".to_string(),
@@ -66,7 +66,7 @@ impl From<Box<dyn std::error::Error>> for AppError {
         AppError {
             message: None, 
             description: Some(error.to_string()),
-            error_type: AppErrorType::ValidationError
+            error_type: AppErrorType::Validation
         }
     }
 }
@@ -75,7 +75,7 @@ impl From<pwhash::error::Error> for AppError {
         AppError {
             message: None, 
             description: Some(error.to_string()),
-            error_type: AppErrorType::ValidationError
+            error_type: AppErrorType::Validation
         }
     }
 }
@@ -84,7 +84,7 @@ impl From<jsonwebtoken::errors::Error> for AppError {
         AppError {
             message: None, 
             description: Some(error.to_string()),
-            error_type: AppErrorType::ValidationError
+            error_type: AppErrorType::Validation
         }
     }
 }
@@ -93,7 +93,7 @@ impl From<BsonError> for AppError {
         AppError {
             message: None, 
             description: Some(error.to_string()),
-            error_type: AppErrorType::ValidationError
+            error_type: AppErrorType::Validation
         }
     }
 }
@@ -102,7 +102,7 @@ impl From<WriteFailure> for AppError {
         AppError {
             message: None, 
             description: None,
-            error_type: AppErrorType::ConflictError
+            error_type: AppErrorType::Conflict
         }
     }
 }
@@ -111,7 +111,7 @@ impl From<WriteConcernError> for AppError {
         AppError {
             message: None, 
             description: None,
-            error_type: AppErrorType::ConflictError
+            error_type: AppErrorType::Conflict
         }
     }
 }
@@ -120,7 +120,7 @@ impl From<WriteError> for AppError {
         AppError {
             message: None, 
             description: None,
-            error_type: AppErrorType::ConflictError
+            error_type: AppErrorType::Conflict
         }
     }
 }
@@ -129,7 +129,7 @@ impl From<OidError> for AppError {
         AppError {
             message: None, 
             description: Some(error.to_string()),
-            error_type: AppErrorType::ValidationError
+            error_type: AppErrorType::Validation
         }
     }
 }
@@ -138,7 +138,7 @@ impl From<MongoDbError> for AppError {
         AppError {
             message: None, 
             description: Some(error.to_string()),
-            error_type: AppErrorType::ValidationError,
+            error_type: AppErrorType::Validation,
         }
     }
 }
@@ -147,7 +147,7 @@ impl From<RedisError> for AppError {
         AppError {
             message: None, 
             description: Some(error.to_string()),
-            error_type: AppErrorType::InternalError,
+            error_type: AppErrorType::Internal,
         }
     }
 }
@@ -163,10 +163,10 @@ pub struct AppErrorResponse {
 impl ResponseError for AppError {
     fn status_code(&self) -> StatusCode {
         match self.error_type {
-            AppErrorType::InternalError => StatusCode::INTERNAL_SERVER_ERROR,
-            AppErrorType::ValidationError => StatusCode::BAD_REQUEST,
-            AppErrorType::UnauthorizedError => StatusCode::UNAUTHORIZED,
-            AppErrorType::ConflictError => StatusCode::CONFLICT,
+            AppErrorType::Internal => StatusCode::INTERNAL_SERVER_ERROR,
+            AppErrorType::Validation => StatusCode::BAD_REQUEST,
+            AppErrorType::Unauthorized => StatusCode::UNAUTHORIZED,
+            AppErrorType::Conflict => StatusCode::CONFLICT,
         }
     }
     fn error_response(&self) -> HttpResponse {

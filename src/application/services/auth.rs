@@ -42,7 +42,7 @@ impl AuthService {
                             "aluno" => UserScope::ALUNO.to_string(),
                             "gestor" => UserScope::GESTOR.to_string(),
                             "professor" => UserScope::PROFESSOR.to_string(),
-                            _ => Err(AppError::new(Some("invalid user_type".to_string()),Some("invalid user_type value".to_string()),crate::errors::AppErrorType::ValidationError))?,
+                            _ => Err(AppError::new(Some("invalid user_type".to_string()),Some("invalid user_type value".to_string()),crate::errors::AppErrorType::Validation))?,
                         },
                         exp: get_current_timestamp() + MAX_EXP,
                     };
@@ -63,11 +63,11 @@ impl AuthService {
                     });
                 }
             } else {
-                return Err(AppError::new(Some("invalid password".to_string()),Some("provide another input value".to_string()),crate::errors::AppErrorType::ValidationError));
+                return Err(AppError::new(Some("invalid password".to_string()),Some("provide another input value".to_string()),crate::errors::AppErrorType::Validation));
             }
         } else {
-            return Err(AppError::new(Some("invalid user".to_string()),Some("invalid user".to_string()),crate::errors::AppErrorType::ValidationError));
+            return Err(AppError::new(Some("invalid user".to_string()),Some("invalid user".to_string()),crate::errors::AppErrorType::Validation));
         }
-        Err(AppError::new(Some("".to_string()),Some("".to_string()),crate::errors::AppErrorType::ValidationError))
+        Err(AppError::new(Some("".to_string()),Some("".to_string()),crate::errors::AppErrorType::Validation))
     }
 }
