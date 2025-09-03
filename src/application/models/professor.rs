@@ -5,21 +5,21 @@ use utoipa::{ToSchema};
 use crate::{infrastructure::database::schemas::user_schema::{MyDateTime, MyObjectId, OptionUserSchema, UserSchema}, utils::regex::{Email, Name, Password}};
 
 #[derive(Serialize,Deserialize,Clone,ToSchema)]
-pub struct CreateAlunoModel {
+pub struct CreateProfessorModel {
     pub name: Name,
     pub email: Email,
     pub matricula: String,
     pub password: Password,
 }
-impl From<CreateAlunoModel> for UserSchema {
-    fn from(value: CreateAlunoModel) -> Self {
+impl From<CreateProfessorModel> for UserSchema {
+    fn from(value: CreateProfessorModel) -> Self {
         Self {
             id: None,
             name: value.name.into(),
             email: value.email.into(),
             matricula: Some(value.matricula),
             password: value.password.0,
-            user_type: "aluno".to_string(),
+            user_type: "Professor".to_string(),
             created_at: DateTime::now().into(),
             updated_at: DateTime::now().into(),
         }
@@ -27,22 +27,22 @@ impl From<CreateAlunoModel> for UserSchema {
 }
 
 #[derive(Serialize,Deserialize,Clone,ToSchema)]
-pub struct AlunoUpdateModel{
+pub struct ProfessorUpdateModel{
     pub name: Option<String>,
     pub email: Option<Email>,
     pub matricula: Option<String>,
 }
-impl From<OptionUserSchema> for AlunoUpdateModel {
+impl From<OptionUserSchema> for ProfessorUpdateModel {
     fn from(user: OptionUserSchema) -> Self {
-        AlunoUpdateModel {
+        ProfessorUpdateModel {
             name: user.name,
             email: user.email.map(|i|i.into()),
             matricula: user.matricula,
         }
     }
 }
-impl From<AlunoUpdateModel> for OptionUserSchema {
-    fn from(user: AlunoUpdateModel) -> Self {
+impl From<ProfessorUpdateModel> for OptionUserSchema {
+    fn from(user: ProfessorUpdateModel) -> Self {
         OptionUserSchema {
             id: None,
             name: user.name,
@@ -56,7 +56,7 @@ impl From<AlunoUpdateModel> for OptionUserSchema {
 }
 
 #[derive(Serialize, Deserialize, Clone)]
-pub struct AlunoQueryModel {
+pub struct ProfessorQueryModel {
     pub id: Option<MyObjectId>,
     pub name: Option<String>,
     pub email: Option<String>,
@@ -66,14 +66,14 @@ pub struct AlunoQueryModel {
     pub updated_at: Option<MyDateTime>,
 }
 
-impl From<AlunoQueryModel> for OptionUserSchema {
-    fn from(user: AlunoQueryModel) -> Self {
+impl From<ProfessorQueryModel> for OptionUserSchema {
+    fn from(user: ProfessorQueryModel) -> Self {
         OptionUserSchema {
             id: user.id,
             name: user.name,
             email: user.email,
             matricula: user.matricula,
-            user_type: Some("aluno".to_string()),
+            user_type: Some("professor".to_string()),
             created_at: user.created_at,
             updated_at: user.updated_at,
         }

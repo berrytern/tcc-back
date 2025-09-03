@@ -1,3 +1,4 @@
+use crate::application::models::professor::ProfessorQueryModel;
 use crate::application::models::user::{UserInput, UserOutput};
 use crate::di::d_injection::App;
 use crate::{
@@ -17,12 +18,13 @@ use mongodb::bson::oid::ObjectId;
 #[get("/v1/professores/{id}")]
 pub async fn get_professor(
     app: Data<App>,
-    query: Query<OptionUserSchema>,
+    query: Query<ProfessorQueryModel>,
     id: Path<String>,
 ) -> Result<impl Responder, AppError> {
     let controller = &app.controllers.professor;
     let mut user = query.into_inner();
     user.id = Some(ObjectId::parse_str(id.into_inner())?.into());
+    let mut user: OptionUserSchema = user.into();
     controller
         .get_one(&mut (user))
         .await
@@ -32,12 +34,13 @@ pub async fn get_professor(
 #[get("/v1/professores")]
 pub async fn get_all_professor(
     app: Data<App>,
-    query: Query<OptionUserSchema>,
+    query: Query<ProfessorQueryModel>,
     options: Query<QueryFilter>,
 ) -> Result<impl Responder, AppError> {
     let controller = &app.controllers.professor;
     let options = options.into_inner();
-    let mut user = query.into_inner();
+    let user = query.into_inner();
+    let mut user: OptionUserSchema = user.into();
     controller
         .get_all_professor(&mut (user), options.into())
         .await

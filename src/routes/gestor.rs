@@ -1,26 +1,28 @@
 use actix_web::{delete, get, patch, post, web::{Data, Json, Path, Query}, Responder};
 use mongodb::bson::oid::ObjectId;
-use crate::{application::{middlewares::auth::verify_access_by_scope, models::{json_token::JsonToken, user::{UserInput, UserOutput}}}, errors::AppError, infrastructure::database::schemas::user_schema::OptionUserSchema, port::query_filter::QueryFilter};
+use crate::{application::{middlewares::auth::verify_access_by_scope, models::{gestor::GestorQueryModel, json_token::JsonToken, user::{UserInput, UserOutput}}}, errors::AppError, infrastructure::database::schemas::user_schema::{ OptionUserSchema}, port::query_filter::QueryFilter};
 use crate::di::d_injection::App;
 
 // gs:r
 #[utoipa::path(tag = "gestor", responses((status = OK, body = Option<UserOutput>)))]
 #[get("/v1/gestores/{id}")]
-pub async fn get_gestor(app: Data<App>, query: Query<OptionUserSchema>, id: Path<String>, jwt_token: JsonToken) -> Result<impl Responder, AppError> {
+pub async fn get_gestor(app: Data<App>, query: Query<GestorQueryModel>, id: Path<String>, jwt_token: JsonToken) -> Result<impl Responder, AppError> {
     verify_access_by_scope(&jwt_token, "gs:r")?;
     let controller = &app.controllers.gestor;
-    let mut user = query.into_inner();
+    let mut user: GestorQueryModel = query.into_inner();
     user.id = Some(ObjectId::parse_str(id.into_inner())?.into());
+    let mut user: OptionUserSchema = user.into();
     controller.get_one(&mut(user)).await
 }
 // gs:r
 #[utoipa::path(tag = "gestor", responses((status = OK, body = Vec<UserOutput>)))]
 #[get("/v1/gestores")]
-pub async fn get_all_gestor(app: Data<App>, query: Query<OptionUserSchema>, options: Query<QueryFilter>, jwt_token: JsonToken) -> Result<impl Responder, AppError> {
+pub async fn get_all_gestor(app: Data<App>, query: Query<GestorQueryModel>, options: Query<QueryFilter>, jwt_token: JsonToken) -> Result<impl Responder, AppError> {
     verify_access_by_scope(&jwt_token, "gs:r")?;
+    let user: GestorQueryModel = query.into_inner(); 
+    let mut user: OptionUserSchema = user.into();
     let controller = &app.controllers.gestor;
     let options = options.into_inner();
-    let mut user = query.into_inner();
     controller.get_all_gestor(&mut(user), options.into()).await
 }
 // gs:c

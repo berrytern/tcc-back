@@ -1,5 +1,5 @@
 use crate::application::{middlewares::auth::verify_access_by_scope, models::{
-    aluno::{AlunoQueryModel, AlunoUpdateModel, CreateAlunoModel}, json_token::JsonToken, user::UserOutput
+    aluno::{AlunoQueryModel, AlunoUpdateModel, CreateAlunoModel}, json_token::JsonToken, user::{self, UserOutput}
 }};
 use crate::di::d_injection::App;
 use crate::{
@@ -24,9 +24,9 @@ pub async fn get_aluno(
     jwt_token: JsonToken
 ) -> Result<impl Responder, AppError> {
     verify_access_by_scope(&jwt_token, "al:r")?;
-    let user: AlunoQueryModel = query.into_inner();
-    let mut user: OptionUserSchema = user.into();
+    let mut user: AlunoQueryModel = query.into_inner();
     user.id = Some(ObjectId::parse_str(id.into_inner())?.into());
+    let mut user: OptionUserSchema = user.into();
     let controller = &app.controllers.aluno;
     controller
         .get_one(&mut (user))
@@ -43,7 +43,7 @@ pub async fn get_all_aluno(
 ) -> Result<impl Responder, AppError> {
     verify_access_by_scope(&jwt_token, "al:r")?;
     let user: AlunoQueryModel = query.into_inner();
-    let user: OptionUserSchema = user.into();
+    let mut user: OptionUserSchema = user.into();
     let redis = &mut app.redis_connection.clone();
     match redis.send_packed_command(redis::cmd("GET").arg(format!("/v1/alunos?{user}"))).await {
         Ok(redis::Value::BulkString(string))=>{
@@ -53,7 +53,7 @@ pub async fn get_all_aluno(
         let controller = &app.controllers.aluno;
         let options = options.into_inner();
         controller
-            .get_all_aluno(&mut (user.into()), options.into(), Some(redis.to_owned()))
+            .get_all_aluno(&mut (user), options.into(), Some(redis.to_owned()))
             .await
         }
     }
