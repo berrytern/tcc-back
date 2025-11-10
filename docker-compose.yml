@@ -1,7 +1,7 @@
 version: "3.8"
 services:
   mongo:
-    image: mongo:4.4.6
+    image: docker.io/mongo:4.4.6
     container_name: tcc-mongo
     ports:
       - 27017:27017
@@ -17,9 +17,9 @@ services:
       driver: json-file
       options:
         max-size: 100m
-  
+
   rabbitmq:
-    image: rabbitmq:3-management-alpine
+    image: docker.io/rabbitmq:3-management-alpine
     container_name: tcc-rabbitmq
     restart: always
     ports:
@@ -29,7 +29,7 @@ services:
     volumes:
       - ./.certs/rabbitmq:/etc/ssl:ro
       - ./external_config/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
-    networks: 
+    networks:
       - tcc-network
     logging:
       driver: json-file
@@ -55,7 +55,7 @@ services:
       options:
         max-size: 100m
   redis:
-    image: redis
+    image: docker.io/redis
     container_name: tcc-redis
     ports:
       - 6379:6379
