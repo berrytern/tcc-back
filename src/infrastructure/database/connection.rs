@@ -22,7 +22,7 @@ pub struct RepoModel<T>
 where
     T: Send + Sync,
 {
-    collection: Box<mongodb::Collection<T>>,
+    collection: mongodb::Collection<T>,
 }
 
 impl<T> RepoModel<T>
@@ -31,7 +31,7 @@ where
 {
     pub async fn new(db: &mongodb::Database, collection_name: &str) ->  Self {
         RepoModel::<T>{
-            collection: Box::new(db.collection::<T>(collection_name))
+            collection: db.collection::<T>(collection_name)
         }
     }
 

@@ -41,10 +41,11 @@ async fn main() -> std::io::Result<()> {
     let env = load_env();
     let app = build(&ENV).await;
 
+    let shared_data = Data::new(app);
 
     HttpServer::new(move || {
         let app =App::new()
-            .app_data(Data::new(app.clone()));
+            .app_data(shared_data.clone());
         let (app, mut api) = app
             .into_utoipa_app()
             .service(login)

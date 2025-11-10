@@ -5,11 +5,11 @@ use crate::{infrastructure::database::schemas::turma_schema::{Turma, OptionTurma
 
 #[derive(Clone)]
 pub struct TurmaController{
-    service: Box<TurmaService>
+    service: TurmaService
 }
 
 impl TurmaController {
-    pub fn new(service: Box<TurmaService>) -> Self{
+    pub fn new(service: TurmaService) -> Self{
         TurmaController{
             service
         }

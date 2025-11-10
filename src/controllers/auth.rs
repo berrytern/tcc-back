@@ -6,11 +6,11 @@ use actix_web::HttpResponse;
 
 #[derive(Clone)]
 pub struct AuthController {
-    service: Box<AuthService>,
+    service: AuthService,
 }
 
 impl AuthController {
-    pub fn new(service: Box<AuthService>) -> Self {
+    pub fn new(service: AuthService) -> Self {
         AuthController { service }
     }
 

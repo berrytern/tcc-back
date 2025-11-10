@@ -1,5 +1,10 @@
 use crate::errors::{AppError,AppErrorType};
 
+enum StatusTypes {
+    Pending,
+    Accepted,
+}
+
 pub struct StatusType {}
 impl StatusType {
     pub fn validate(value: &str) -> Result<&str, AppError> {

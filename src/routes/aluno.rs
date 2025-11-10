@@ -1,5 +1,5 @@
 use crate::application::{middlewares::auth::verify_access_by_scope, models::{
-    aluno::{AlunoQueryModel, AlunoUpdateModel, CreateAlunoModel}, json_token::JsonToken, user::{self, UserOutput}
+    aluno::{AlunoQueryModel, AlunoUpdateModel, CreateAlunoModel}, json_token::JsonToken, user::{UserOutput}
 }};
 use crate::di::d_injection::App;
 use crate::{
@@ -83,7 +83,7 @@ pub async fn update_aluno(
     let controller = &app.controllers.aluno;
     let id = ObjectId::parse_str(id.into_inner())?;
     controller
-        .update_aluno(Box::new(user.into_inner()), &id)
+        .update_aluno(user.into_inner(), &id)
         .await
 }
 // al:d

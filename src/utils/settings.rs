@@ -7,6 +7,7 @@ pub struct Env{
     pub port: u16,
     pub mongodb_uri: String,
     pub rabbitmq_uri: String,
+    pub redis_uri: String,
     pub jwt_secret: String,
     pub hash_salt: String,
     pub hash_cost: u32,
@@ -18,6 +19,7 @@ impl Default for Env{
             port: 8080,
             mongodb_uri: "".to_string(),
             rabbitmq_uri: "".to_string(),
+            redis_uri: "".to_string(),
             jwt_secret: "".to_string(),
             hash_salt: "".to_string(),
             hash_cost: 13,
@@ -44,6 +46,10 @@ pub fn load_env() -> Env {
         rabbitmq_uri: match env::var("RABBITMQ_URI"){
             Ok(var) => var,
             Err(_error) => panic!("Environment variable 'RABBITMQ_URI' not setted")
+        },
+        redis_uri: match env::var("REDIS_URI"){
+            Ok(var) => var,
+            Err(_error) => panic!("Environment variable 'REDIS_URI' not setted")
         },
         jwt_secret: match env::var("JWT_SECRET"){
             Ok(var) => var,

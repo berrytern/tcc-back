@@ -1,17 +1,17 @@
 use mongodb::bson::oid::ObjectId;
 use pwhash::bcrypt;
-use crate::application::models::user::{UserInput, UserOutput};
-use crate::application::validation::create_user::CreateUserValidation;
-use crate::application::validation::update_user::UpdateUserValidation;
+use crate::application::models::professor::{CreateProfessorModel, ProfessorUpdateModel};
+use crate::application::models::user::{UserOutput};
+use crate::infrastructure::database::schemas::user_schema::UserSchema;
 use crate::{infrastructure::{repository::professor_repository::ProfessorRepository, database::schemas::user_schema::OptionUserSchema}, errors::AppError, port::query_filter::QueryOptions};
 
 #[derive(Clone)]
 pub struct ProfessorService{
-    repository: Box<ProfessorRepository>
+    repository: ProfessorRepository
 }
 
 impl ProfessorService {
-    pub fn new(repository: Box<ProfessorRepository>) -> Self{
+    pub fn new(repository: ProfessorRepository) -> Self{
         ProfessorService{
             repository
         }
@@ -26,17 +26,18 @@ impl ProfessorService {
             .get_all(user, options).await.map( |item| item.into_iter().map(UserOutput::from).collect::<Vec<UserOutput>>())?)
     }
 
-    pub async fn create_professor(&self, user: UserInput) -> Result<Option<UserOutput>, AppError> {
-        let mut user = CreateUserValidation::validate(user, "professor")?;
+    pub async fn create_professor(&self, user: CreateProfessorModel) -> Result<Option<UserOutput>, AppError> {
+        let mut user: UserSchema = user.into();
         user.password = bcrypt::hash(user.password)?;
         Ok(self.repository.create(user).await
             .map(|opt_user| opt_user.map(UserOutput::from))?)
     }
     
-    pub async fn update_professor(&self, mut user: Box<OptionUserSchema>, id: &ObjectId) -> Result<Option<UserOutput>, AppError> {
-        UpdateUserValidation::validate(&mut(user))?;
+    pub async fn update_professor(&self, user: ProfessorUpdateModel, id: &ObjectId) -> Result<Option<UserOutput>, AppError> {
+
+        let user: OptionUserSchema = user.into();
         Ok(self.repository.update_one(
-            user, id
+            &user, id
         ).await.map(|op|op.map(UserOutput::from))?)
     }
     

@@ -9,10 +9,10 @@ use crate::port::query_filter::QueryOptions;
 
 #[derive(Clone)]
 pub struct SolicitacaoRepository{
-    model: Box<RepoModel<SolicitacaoSchema>>,
+    model: RepoModel<SolicitacaoSchema>,
 }
 impl SolicitacaoRepository {
-    pub async fn new(model: Box<RepoModel<SolicitacaoSchema>>)-> Self{
+    pub async fn new(model: RepoModel<SolicitacaoSchema>)-> Self{
         let options = IndexOptions::builder().unique(true).build();
         let index = IndexModel::builder().keys(doc!{"id_aluno":1,"id_professor":1}).options(options).build();
         let _ = model.create_index(index, None).await;
@@ -28,13 +28,12 @@ impl SolicitacaoRepository {
         let filter = to_document(solicitacao).expect("error converting to document");
         self.model.find(filter, options).await
     }
-    pub async fn create(&self, mut solicitacao: Box<SolicitacaoSchema>) ->  Result<Option<Box<SolicitacaoSchema>>,AppError> {
+    pub async fn create(&self, solicitacao: &mut SolicitacaoSchema) ->  Result<(), AppError> {
         Ok(self.model.create(&solicitacao).await.map(|op_id| {
             solicitacao.id = op_id;
-            Some(solicitacao)
         })?)
     }
-    pub async fn update_one(&self, solicitacao: Box<OptionSolicitacaoSchema>, aluno_id: &ObjectId, prof_id: &ObjectId) ->  Result<Option<SolicitacaoSchema>,AppError> {
+    pub async fn update_one(&self, solicitacao: OptionSolicitacaoSchema, aluno_id: &ObjectId, prof_id: &ObjectId) ->  Result<Option<SolicitacaoSchema>,AppError> {
         let filter = doc!{"aluno_id":aluno_id,"professor_id":prof_id};
         match self.model.update_one(solicitacao, filter, None).await {
             Ok(up) => {

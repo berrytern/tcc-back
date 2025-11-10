@@ -8,7 +8,6 @@ use crate::{infrastructure::database::schemas::user_schema::{MyDateTime, MyObjec
 pub struct CreateGestorModel {
     pub name: Name,
     pub email: Email,
-    pub matricula: String,
     pub password: Password,
 }
 impl From<CreateGestorModel> for UserSchema {
@@ -17,9 +16,9 @@ impl From<CreateGestorModel> for UserSchema {
             id: None,
             name: value.name.into(),
             email: value.email.into(),
-            matricula: Some(value.matricula),
+            matricula: None,
             password: value.password.0,
-            user_type: "Gestor".to_string(),
+            user_type: "gestor".to_string(),
             created_at: DateTime::now().into(),
             updated_at: DateTime::now().into(),
         }
@@ -37,7 +36,7 @@ impl From<OptionUserSchema> for GestorUpdateModel {
         GestorUpdateModel {
             name: user.name,
             email: user.email.map(|i|i.into()),
-            matricula: user.matricula,
+            matricula: None,
         }
     }
 }
@@ -47,7 +46,7 @@ impl From<GestorUpdateModel> for OptionUserSchema {
             id: None,
             name: user.name,
             email: user.email.map(|i|i.into()),
-            matricula: user.matricula,
+            matricula: None,
             user_type: None,
             created_at: None,
             updated_at: Some(DateTime::now().into()),

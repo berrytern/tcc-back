@@ -1,4 +1,5 @@
 use std::borrow::BorrowMut;
+use std::sync::Arc;
 
 use amqp_client_rust::api::eventbus::AsyncEventbusRabbitMQ;
 use amqp_client_rust::domain::config::{Config, ConfigOptions};
@@ -70,22 +71,22 @@ pub async fn build(env: &Env) -> App {
         .await
         .expect("Cannot connect to MongoDb");
     let db = client.database("teste");
-    let user_model = RepoModel::<UserSchema>::new(&db, "users").await;
+    let user_model = Arc::new(RepoModel::<UserSchema>::new(&db, "users").await);
     let auth_model = RepoModel::<Auth>::new(&db, "auth").await;
     let solicitacao_model = RepoModel::<SolicitacaoSchema>::new(&db, "solicitacoes").await;
     let turma_model = RepoModel::<Turma>::new(&db, "turmas").await;
 
-    let user = UserRepository::new(Box::new(user_model.clone())).await;
-    let aluno = AlunoRepository::new(Box::new(user_model.clone())).await;
-    let auth = AuthRepository::new(Box::new(auth_model)).await;
-    let gestor = GestorRepository::new(Box::new(user_model.clone())).await;
-    let professor = ProfessorRepository::new(Box::new(user_model)).await;
-    let solicitacao = SolicitacaoRepository::new(Box::new(solicitacao_model)).await;
-    let turma = TurmaRepository::new(Box::new(turma_model)).await;
+    let user = UserRepository::new(user_model.clone()).await;
+    let aluno = Arc::new(AlunoRepository::new(user_model.clone()).await);
+    let auth = AuthRepository::new(auth_model).await;
+    let gestor = GestorRepository::new(user_model.clone()).await;
+    let professor = ProfessorRepository::new(user_model).await;
+    let solicitacao = SolicitacaoRepository::new(solicitacao_model).await;
+    let turma = TurmaRepository::new(turma_model).await;
 
     let aluno_repository = aluno.clone();
     let get_alunos = move |body:Vec<u8>| {
-        let aluno_repository = aluno.clone();
+        let aluno_repository = aluno_repository.clone();
         async move {
             let mut query: (OptionUserSchema, QueryOptions) = serde_json::from_slice(&body)?;
             let result = aluno_repository.get_all(query.0.borrow_mut(), query.1).await
@@ -98,21 +99,21 @@ pub async fn build(env: &Env) -> App {
     // Register rpc provider binded with alunos.find
     eventbus.rpc_server(get_alunos, "alunos.find", "application/json", None).await;
 
-    let aluno = AlunoService::new(Box::new(aluno_repository));
-    let auth = AuthService::new(Box::new(auth), Box::new(user));
-    let gestor = GestorService::new(Box::new(gestor));
-    let professor = ProfessorService::new(Box::new(professor));
-    let solicitacao = SolicitacaoService::new(Box::new(solicitacao));
-    let turma = TurmaService::new(Box::new(turma));
+    let aluno = AlunoService::new(aluno);
+    let auth = AuthService::new(auth, user);
+    let gestor = GestorService::new(gestor);
+    let professor = ProfessorService::new(professor);
+    let solicitacao = SolicitacaoService::new(solicitacao);
+    let turma = TurmaService::new(turma);
 
     App {
         controllers: Controller {
-            aluno: AlunoController::new(Box::new(aluno)),
-            auth: AuthController::new(Box::new(auth)),
-            gestor: GestorController::new(Box::new(gestor)),
-            professor: ProfessorController::new(Box::new(professor)),
-            solicitacao: SolicitacaoController::new(Box::new(solicitacao)),
-            turma: TurmaController::new(Box::new(turma)),
+            aluno: AlunoController::new(aluno),
+            auth: AuthController::new(auth),
+            gestor: GestorController::new(gestor),
+            professor: ProfessorController::new(professor),
+            solicitacao: SolicitacaoController::new(solicitacao),
+            turma: TurmaController::new(turma),
         },
         redis_connection,
         env: env.clone(),

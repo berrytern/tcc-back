@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use mongodb::bson::{DateTime};
 use serde::{Serialize, Deserialize};
 use utoipa::ToSchema;
@@ -44,10 +46,44 @@ impl From<OptionSolicitacaoSchema> for Solicitacao {
 }
 
 #[derive(Serialize,Deserialize,Clone,ToSchema)]
+pub struct Pending;
+#[derive(Serialize,Deserialize,Clone,ToSchema)]
+pub struct Approved;
+#[derive(Serialize,Deserialize,Clone,ToSchema)]
+pub struct Rejected;
+
+#[derive(Serialize, Deserialize, Clone, ToSchema)]
+pub struct SolicitacaoStatus<State>{
+    state: State
+}
+impl SolicitacaoStatus<Pending> {
+    pub fn approve(self) -> SolicitacaoStatus<Approved> {
+        SolicitacaoStatus{state:Approved}
+    }
+    pub fn reject(self) -> SolicitacaoStatus<Rejected> {
+        SolicitacaoStatus{state:Rejected}
+    }
+}
+impl Display for SolicitacaoStatus<Pending> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "pending")
+    }
+}
+impl Display for SolicitacaoStatus<Approved> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "approved")
+    }
+}
+impl Display for SolicitacaoStatus<Rejected> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "rejected")
+    }
+}
+
+#[derive(Serialize,Deserialize,Clone,ToSchema)]
 pub struct CreateSolicitacaoModel{
     pub id_aluno: MyObjectId,
     pub id_professor: MyObjectId,
-    pub status: String,
     pub description: String,
     pub comment: String,
 }
@@ -57,11 +93,41 @@ impl From<CreateSolicitacaoModel> for SolicitacaoSchema {
             id: None,
             id_aluno: value.id_aluno,
             id_professor: value.id_professor,
-            status: "pending".to_string(),
+            status: SolicitacaoStatus{state:Pending}.to_string(),
             description: value.description,
             comment: value.comment,
-            created_at: Some(DateTime::now().into()), // Will be set by the database
-            updated_at: Some(DateTime::now().into()), // Will be set by the database
+            created_at: Some(DateTime::now().into()),
+            updated_at: Some(DateTime::now().into())
+        }
+    }
+}
+#[derive(Serialize,Deserialize,Clone,ToSchema)]
+pub enum AnswerStatus {
+    Approved(Approved),
+    Rejected(Rejected),
+}
+impl std::fmt::Display for SolicitacaoStatus<AnswerStatus> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.to_string())
+    }
+}
+
+#[derive(Serialize,Deserialize,Clone,ToSchema)]
+pub struct UpdateSolicitacaoModel{
+    pub status: Option<SolicitacaoStatus<AnswerStatus>>,
+    pub description: Option<String>,
+    pub comment: Option<String>,
+}
+impl From<UpdateSolicitacaoModel> for OptionSolicitacaoSchema {
+    fn from(value: UpdateSolicitacaoModel) -> Self {
+        Self {
+            id_aluno: None,
+            id_professor: None,
+            status: value.status.map(|status| status.to_string()),
+            description: value.description,
+            comment: value.comment,
+            created_at: Some(DateTime::now().into()),
+            updated_at: Some(DateTime::now().into())
         }
     }
 }

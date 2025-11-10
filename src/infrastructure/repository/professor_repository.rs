@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use mongodb::bson::oid::ObjectId;
 use mongodb::{IndexModel,
     bson::{to_document, doc, extjson::de::Error as BsonError},
@@ -9,10 +11,10 @@ use crate::port::query_filter::QueryOptions;
 
 #[derive(Clone)]
 pub struct ProfessorRepository{
-    model: Box<RepoModel<UserSchema>>,
+    model: Arc<RepoModel<UserSchema>>,
 }
 impl ProfessorRepository {
-    pub async fn new(model: Box<RepoModel<UserSchema>>)-> Self{
+    pub async fn new(model: Arc<RepoModel<UserSchema>>)-> Self{
         let options = IndexOptions::builder().unique(true).build();
         let index = IndexModel::builder().keys(doc!{"email":1}).options(options).build();
         let _ = model.create_index(index, None).await;
@@ -36,7 +38,7 @@ impl ProfessorRepository {
             Some(user)
         })
     }
-    pub async fn update_one(&self, user: Box<OptionUserSchema>, id: &ObjectId) ->  Result<Option<UserSchema>,BsonError> {
+    pub async fn update_one(&self, user: &OptionUserSchema, id: &ObjectId) ->  Result<Option<UserSchema>,BsonError> {
         let filter = doc!{"_id":id};
         match self.model.update_one(user, filter, None).await {
             Ok(up) => {

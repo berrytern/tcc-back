@@ -1,15 +1,16 @@
 use actix_web::HttpResponse;
 use mongodb::bson::oid::ObjectId;
+use crate::application::models::solicitacao::{CreateSolicitacaoModel, UpdateSolicitacaoModel};
 use crate::application::services::solicitacao::SolicitacaoService;
 use crate::{infrastructure::database::schemas::solicitacao_schema::{SolicitacaoSchema, OptionSolicitacaoSchema}, errors::AppError, port::query_filter::QueryOptions};
 
 #[derive(Clone)]
 pub struct SolicitacaoController{
-    service: Box<SolicitacaoService>
+    service: SolicitacaoService
 }
 
 impl SolicitacaoController {
-    pub fn new(service: Box<SolicitacaoService>) -> Self {
+    pub fn new(service: SolicitacaoService) -> Self {
         SolicitacaoController {
             service
         }
@@ -24,14 +25,14 @@ impl SolicitacaoController {
             .map(|result| HttpResponse::Ok().json(result))
     }
     
-    pub async fn create_solicitacao(&self, solicitacao: Box<SolicitacaoSchema>) -> Result<HttpResponse, AppError> {
+    pub async fn create_solicitacao(&self, solicitacao: CreateSolicitacaoModel) -> Result<HttpResponse, AppError> {
         self.service.create_solicitacao(solicitacao).await
             .map(|result| {
                 if result.is_some() {HttpResponse::Created().json(Some(result))} else {HttpResponse::Ok().body("")}
             })
     }
     
-    pub async fn update_solicitacao(&self, solicitacao: Box<OptionSolicitacaoSchema>, aluno_id: &ObjectId, prof_id: &ObjectId) -> Result<HttpResponse, AppError> {
+    pub async fn update_solicitacao(&self, solicitacao: UpdateSolicitacaoModel, aluno_id: &ObjectId, prof_id: &ObjectId) -> Result<HttpResponse, AppError> {
         self.service.update_solicitacao(
             solicitacao, aluno_id, prof_id
         ).await

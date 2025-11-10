@@ -45,9 +45,10 @@ services:
       - HASH_SALT=${HASH_SALT}
       - HASH_COUNT=${HASH_COUNT}
       - RABBITMQ_URI=amqp://guest:guest@rabbitmq:5672/
+      - REDIS_URI=${REDIS_URI}
     ports:
       - 8080:8080
-    networks: 
+    networks:
       - tcc-network
     logging:
       driver: json-file

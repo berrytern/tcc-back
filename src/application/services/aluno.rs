@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use crate::application::models::aluno::{AlunoUpdateModel, CreateAlunoModel};
 use crate::application::models::user::UserOutput;
 use crate::infrastructure::database::schemas::user_schema::UserSchema;
@@ -14,11 +16,11 @@ use pwhash::bcrypt;
 
 #[derive(Clone)]
 pub struct AlunoService {
-    repository: Box<AlunoRepository>,
+    repository: Arc<AlunoRepository>,
 }
 
 impl AlunoService {
-    pub fn new(repository: Box<AlunoRepository>) -> Self {
+    pub fn new(repository: Arc<AlunoRepository>) -> Self {
         AlunoService { repository }
     }
 
@@ -45,10 +47,10 @@ impl AlunoService {
 
     pub async fn update_aluno(
         &self,
-        user: Box<AlunoUpdateModel>,
+        user: AlunoUpdateModel,
         id: &ObjectId,
     ) -> Result<Option<UserOutput>, AppError> {
-        let user: OptionUserSchema = (*user).into();
+        let user: OptionUserSchema = user.into();
         Ok(self.repository.update_one(&user, id).await.map(|op|op.map(UserOutput::from))?)
     }
 

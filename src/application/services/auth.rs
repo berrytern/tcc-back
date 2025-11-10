@@ -17,12 +17,12 @@ use pwhash::bcrypt::{self, BcryptSetup};
 
 #[derive(Clone)]
 pub struct AuthService {
-    repository: Box<AuthRepository>,
-    user_repository: Box<UserRepository>,
+    repository: AuthRepository,
+    user_repository: UserRepository,
 }
 
 impl AuthService {
-    pub fn new(repository: Box<AuthRepository>, user_repository: Box<UserRepository>) -> Self {
+    pub fn new(repository: AuthRepository, user_repository: UserRepository) -> Self {
         AuthService { 
             repository,
             user_repository,

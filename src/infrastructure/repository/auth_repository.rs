@@ -7,10 +7,10 @@ use crate::port::query_filter::QueryOptions;
 
 #[derive(Clone)]
 pub struct AuthRepository{
-    model: Box<RepoModel<Auth>>,
+    model: RepoModel<Auth>,
 }
 impl AuthRepository {
-    pub async fn new(model: Box<RepoModel<Auth>>)-> Self{
+    pub async fn new(model: RepoModel<Auth>)-> Self{
         AuthRepository {
             model
         }

@@ -1,3 +1,4 @@
+
 use {
     once_cell::sync::Lazy,
     regex::Regex, // no backtrack
@@ -72,7 +73,7 @@ impl<'de> Deserialize<'de> for Password  {
         let s = String::deserialize(deserializer)?;
         match RE_PASSWORD.is_match(&s) {
             Ok(true) => Ok(Password(s)),
-            _ => Err(serde::de::Error::custom("Invalid password format"))
+            _ => Err(serde::de::Error::invalid_value(serde::de::Unexpected::Str("invalid password"), &"Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one digit, and one special character.")),
         }
     }
 }

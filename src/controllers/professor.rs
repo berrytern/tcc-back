@@ -1,4 +1,4 @@
-use crate::application::models::user::UserInput;
+use crate::application::models::professor::{CreateProfessorModel, ProfessorUpdateModel};
 use crate::application::services::professor::ProfessorService;
 use crate::{
     errors::AppError,
@@ -9,11 +9,11 @@ use actix_web::HttpResponse;
 use mongodb::bson::oid::ObjectId;
 #[derive(Clone)]
 pub struct ProfessorController {
-    service: Box<ProfessorService>,
+    service: ProfessorService,
 }
 
 impl ProfessorController {
-    pub fn new(service: Box<ProfessorService>) -> Self {
+    pub fn new(service: ProfessorService) -> Self {
         ProfessorController { service }
     }
 
@@ -36,7 +36,7 @@ impl ProfessorController {
             .map(|result| HttpResponse::Ok().json(result))
     }
 
-    pub async fn create_professor(&self, user: UserInput) -> Result<HttpResponse, AppError> {
+    pub async fn create_professor(&self, user: CreateProfessorModel) -> Result<HttpResponse, AppError> {
         self.service.create_professor(user).await.map(|result| {
             if result.is_some() {
                 HttpResponse::Created().json(Some(result))
@@ -48,7 +48,7 @@ impl ProfessorController {
 
     pub async fn update_professor(
         &self,
-        user: Box<OptionUserSchema>,
+        user: ProfessorUpdateModel,
         id: &ObjectId,
     ) -> Result<HttpResponse, AppError> {
         self

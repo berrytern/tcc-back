@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use mongodb::bson::oid::ObjectId;
 use mongodb::{IndexModel,
     bson::{to_document, doc, extjson::de::Error as BsonError},
@@ -8,10 +10,10 @@ use crate::port::query_filter::QueryOptions;
 
 #[derive(Clone)]
 pub struct UserRepository{
-    model: Box<RepoModel<UserSchema>>,
+    model: Arc<RepoModel<UserSchema>>,
 }
 impl UserRepository {
-    pub async fn new(model: Box<RepoModel<UserSchema>>)-> Self{
+    pub async fn new(model: Arc<RepoModel<UserSchema>>)-> Self{
         let options = IndexOptions::builder().unique(true).build();
         let index = IndexModel::builder().keys(doc!{"email":1}).options(options).build();
         let _ = model.create_index(index, None).await;

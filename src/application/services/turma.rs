@@ -3,11 +3,11 @@ use crate::{infrastructure::{database::schemas::turma_schema::{Turma, OptionTurm
 
 #[derive(Clone)]
 pub struct TurmaService{
-    repository: Box<TurmaRepository>
+    repository: TurmaRepository
 }
 
 impl TurmaService {
-    pub fn new(repository: Box<TurmaRepository>) -> Self{
+    pub fn new(repository: TurmaRepository) -> Self{
         TurmaService{
             repository
         }

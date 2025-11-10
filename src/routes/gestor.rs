@@ -1,6 +1,6 @@
 use actix_web::{delete, get, patch, post, web::{Data, Json, Path, Query}, Responder};
 use mongodb::bson::oid::ObjectId;
-use crate::{application::{middlewares::auth::verify_access_by_scope, models::{gestor::GestorQueryModel, json_token::JsonToken, user::{UserInput, UserOutput}}}, errors::AppError, infrastructure::database::schemas::user_schema::{ OptionUserSchema}, port::query_filter::QueryFilter};
+use crate::{application::{middlewares::auth::verify_access_by_scope, models::{gestor::{CreateGestorModel, GestorQueryModel, GestorUpdateModel}, json_token::JsonToken, user::{UserInput, UserOutput}}}, errors::AppError, infrastructure::database::schemas::user_schema::OptionUserSchema, port::query_filter::QueryFilter};
 use crate::di::d_injection::App;
 
 // gs:r
@@ -28,7 +28,7 @@ pub async fn get_all_gestor(app: Data<App>, query: Query<GestorQueryModel>, opti
 // gs:c
 #[utoipa::path(tag = "gestor", responses((status = OK, body = UserOutput)))]
 #[post("/v1/gestores")]
-pub async fn create_gestor(app: Data<App>, user: Json<UserInput>) -> Result<impl Responder, AppError> {
+pub async fn create_gestor(app: Data<App>, user: Json<CreateGestorModel>) -> Result<impl Responder, AppError> {
     // verify_access_by_scope(&jwt_token, "gs:c")?;
     let controller = &app.controllers.gestor;
     controller.create_gestor(user.into_inner()).await
@@ -36,12 +36,12 @@ pub async fn create_gestor(app: Data<App>, user: Json<UserInput>) -> Result<impl
 // gs:u
 #[utoipa::path(tag = "gestor", responses((status = OK, body = UserOutput)))]
 #[patch("/v1/gestores/{id}")]
-pub async fn update_gestor(app: Data<App>, user: Json<OptionUserSchema>, id: Path<String>, jwt_token: JsonToken) -> Result<impl Responder, AppError> {
+pub async fn update_gestor(app: Data<App>, user: Json<GestorUpdateModel>, id: Path<String>, jwt_token: JsonToken) -> Result<impl Responder, AppError> {
     verify_access_by_scope(&jwt_token, "gs:u")?;
     let controller = &app.controllers.gestor;
     let id = ObjectId::parse_str(id.into_inner())?;
     controller.update_gestor(
-        Box::new(user.into_inner()), &id
+        user.into_inner(), &id
     ).await
 }
 // gs:d

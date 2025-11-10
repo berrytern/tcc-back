@@ -11,6 +11,8 @@ pub struct CreateProfessorModel {
     pub matricula: String,
     pub password: Password,
 }
+
+
 impl From<CreateProfessorModel> for UserSchema {
     fn from(value: CreateProfessorModel) -> Self {
         Self {
@@ -19,7 +21,7 @@ impl From<CreateProfessorModel> for UserSchema {
             email: value.email.into(),
             matricula: Some(value.matricula),
             password: value.password.0,
-            user_type: "Professor".to_string(),
+            user_type: "professor".to_string(),
             created_at: DateTime::now().into(),
             updated_at: DateTime::now().into(),
         }

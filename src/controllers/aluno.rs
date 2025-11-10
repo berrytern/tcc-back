@@ -13,11 +13,11 @@ use redis::AsyncCommands;
 
 #[derive(Clone)]
 pub struct AlunoController {
-    service: Box<AlunoService>,
+    service: AlunoService,
 }
 
 impl AlunoController {
-    pub fn new(service: Box<AlunoService>) -> Self {
+    pub fn new(service: AlunoService) -> Self {
         AlunoController { service }
     }
 
@@ -61,7 +61,7 @@ impl AlunoController {
 
     pub async fn update_aluno(
         &self,
-        user: Box<AlunoUpdateModel>,
+        user: AlunoUpdateModel,
         id: &ObjectId,
     ) -> Result<HttpResponse, AppError> {
         self.service.update_aluno(user, id).await.map(|result| {

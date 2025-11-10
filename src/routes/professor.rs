@@ -1,5 +1,5 @@
-use crate::application::models::professor::ProfessorQueryModel;
-use crate::application::models::user::{UserInput, UserOutput};
+use crate::application::models::professor::{CreateProfessorModel, ProfessorQueryModel, ProfessorUpdateModel};
+use crate::application::models::user::{UserOutput};
 use crate::di::d_injection::App;
 use crate::{
     errors::AppError,
@@ -51,7 +51,7 @@ pub async fn get_all_professor(
 #[post("/v1/professores")]
 pub async fn create_professor(
     app: Data<App>,
-    user: Json<UserInput>,
+    user: Json<CreateProfessorModel>,
 ) -> Result<impl Responder, AppError> {
     let controller = &app.controllers.professor;
     controller
@@ -63,13 +63,13 @@ pub async fn create_professor(
 #[patch("/v1/professores/{id}")]
 pub async fn update_professor(
     app: Data<App>,
-    user: Json<OptionUserSchema>,
+    user: Json<ProfessorUpdateModel>,
     id: Path<String>,
 ) -> Result<impl Responder, AppError> {
     let controller = &app.controllers.professor;
     let id = ObjectId::parse_str(id.into_inner())?;
     controller
-        .update_professor(Box::new(user.into_inner()), &id)
+        .update_professor(user.into_inner(), &id)
         .await
 }
 // pf:d
