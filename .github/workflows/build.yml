@@ -1,0 +1,35 @@
+name: Rust
+
+on:
+  push:
+    branches: [ "master", "develop" ]
+  pull_request:
+    branches: [ "master", "develop" ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+
+    runs-on: self-hosted
+    container: rust:alpine3.22
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install cargo
+      run: |
+        curl https://sh.rustup.rs -sSf | sh -s -- -y
+        echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+    - name: Install build essentials (linker)
+      run: |
+        # This assumes a Debian/Ubuntu-based self-hosted runner.
+        # If your runner uses a different OS, you'll need to change this command.
+        # (e.g., 'yum install gcc' or 'dnf install gcc' for RHEL/Fedora)
+        sudo apt-get update
+        sudo apt-get install -y build-essential
+    - name: Build
+      run: |
+        cargo build
+    #- name: Run tests
+    #  run: cargo test --verbose
